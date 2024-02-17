@@ -30,6 +30,7 @@ External librar for exporting Gedcom to Geneanet
 #
 #-------------------------------------------------------------------------
 
+from collections import defaultdict
 #------------------------------------------------------------------------
 #
 # GTK modules
