@@ -29,6 +29,7 @@ External librar for exporting Gedcom to Geneanet
 # Standard Python Modules
 #
 #-------------------------------------------------------------------------
+from collections import defaultdict
 
 #------------------------------------------------------------------------
 #
