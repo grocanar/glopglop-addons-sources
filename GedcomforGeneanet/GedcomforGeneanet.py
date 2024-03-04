@@ -1398,9 +1398,6 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 continue
             self._note_references(attr.get_note_list(), 2)
             self._source_references(attr.get_citation_list(), 2)
-        gid = person.get_gramps_id()
-        self._writeln(1, 'FACT', gid)
-        self._writeln(2, 'TYPE', 'GRAMPS ID')
 
     def _header(self, filename):
         """
