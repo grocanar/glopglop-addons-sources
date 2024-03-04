@@ -4,7 +4,7 @@ register(GRAMPLET,
 	name=_("Sosa Gramplet"),
 	description = _("a gramplet that displays sosa of a person"),
 	status = UNSTABLE, # not yet tested with python 3
-	version = '1.0.31',
+	version = '1.0.32',
 	fname="SosaGramplet.py",
     authors = ["Eric Doutreleau"],
     authors_email = ["eric@doutreleau.fr"],
