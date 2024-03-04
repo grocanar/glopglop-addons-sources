@@ -5,6 +5,8 @@ register(IMPORT,
          version = '0.0.26',
          gramps_target_version = "5.2",
          status = UNSTABLE,
+         authors = ["Eric Doutreleau"],
+         authors_email = ["eric@doutreleau.fr"],
          fname = 'ImportGenewebPlus.py',
          import_function = 'importData',
          extension = "gwplus"
