@@ -32,7 +32,7 @@ le plus simple est d'utiliser mon dépot tiers pour installer le greffon.
 ### en version 5.2
 
 Il suffit de rajouter un nouveau projet dans le gestion de greffon 
-![config](.Gedcomforgeneanet.png)
+![config](./Gedcomforgeneanet.png)
 
 ### en version 5.1 
 
