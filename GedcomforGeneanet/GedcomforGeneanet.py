@@ -747,9 +747,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                         return
                     base = media_path(self.dbase)
                     path = relative_path(fullpath,base)
+                    zippath = fullpath
                 else:
                     path = media_path_full(self.dbase, photo_obj.get_path())
-                    if not os.path.isfile(path):
+                    zippath = path
+                    if not os.path.isfile(zippath):
                         return
                 self._writeln(level, 'OBJE')
                 if form:
@@ -758,7 +760,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(level+1, 'FILE', path, limit=255)
                 self._note_references(photo_obj.get_note_list(), level+1)
                 if self.zip:
-                    self._packzip(path)
+                    self._packzip(zippath)
  
  
     def _packzip(self, path ):
@@ -1734,6 +1736,7 @@ class GedcomWriterOptionBox(WriterOptionBox):
         vbox2.pack_start(self.ancplacename_check, False, False, 0)
         vbox2.pack_start(self.extendedtitle_check, False, False, 0)
         vbox2.pack_start(self.grouptitle_check, False, False, 0)
+        return option_box
 
 
     def parse_options(self):
