@@ -203,7 +203,7 @@ def do_tar(inc_files):
         return tinfo
 
     mkdir(f"../glopglop-addons/{gramps_version}/download")
-    increment_target(glob.glob(f"{addon}/*gpr.py"))
+    #increment_target(glob.glob(f"{addon}/*gpr.py"))
     tar = tarfile.open(
         f"../glopglop-addons/{gramps_version}/download/{addon}.addon.tgz",
         mode="w:gz",
