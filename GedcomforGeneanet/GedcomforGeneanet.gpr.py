@@ -33,14 +33,13 @@ from gramps.version import major_version
 # Extensions to the GEDCOM format (GED2)
 #
 #------------------------------------------------------------------------
-VERSION='2.1.54'
 
 register(EXPORT,
     id    = 'Export GEDCOM for Geneanet',
     name  = _("Export GEDCOM for Geneanet "),
     name_accell  = _("GEDCOM for Geneanet "),
     description =  _("Extensions to the common GEDCOM format for Geneanet transfert."),
-    version = 'ERSIO.0.2',
+    version = '2.1.54',
     gramps_target_version = major_version,
     status = STABLE, 
     fname = 'GedcomforGeneanet.py',
