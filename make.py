@@ -56,6 +56,7 @@ import sys
 import os
 import tarfile
 import json
+from zipfile import ZipFile
 from xml.etree import ElementTree
 from subprocess import call, Popen, PIPE
 
@@ -204,6 +205,11 @@ def do_tar(inc_files):
 
     mkdir(f"../glopglop-addons/{gramps_version}/download")
     #increment_target(glob.glob(f"{addon}/*gpr.py"))
+    with ZipFile(r("../glopglop-addons/%(gramps_version)s/download/%(addon)s.zip"),'w') as zip:
+        # writing each file one by one
+        for inc_fil in inc_files:
+            zip.write(inc_fil)
+
     tar = tarfile.open(
         f"../glopglop-addons/{gramps_version}/download/{addon}.addon.tgz",
         mode="w:gz",

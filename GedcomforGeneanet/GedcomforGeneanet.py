@@ -1343,13 +1343,16 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     text = typ + " : " + val
                     self._writeln(3,'DATA', text )
             
-        if ancplace:
-            self._note_references(event.get_note_list(), 2)
-            self._source_references(event.get_citation_list(), 2)
+        self._note_references(event.get_note_list(), 2)
+        self._note_references(event_ref.get_note_list(), 2)
 
-            self._photos(event.get_media_list(), 2)
-            if place:
-                self._photos(place.get_media_list(), 2)
+        self._source_references(event.get_citation_list(), 2)
+        self._source_references(event_ref.get_citation_list(), 2)
+
+        self._photos(event.get_media_list(), 2)
+
+        if place:
+            self._photos(place.get_media_list(), 2)
     
 
     def _attributes(self, person):
