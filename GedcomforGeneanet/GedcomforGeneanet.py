@@ -70,6 +70,7 @@ except ImportError:
     IsAbleExtprog=False
 else:
     IsAbleExtprog=True
+from gramps.gen.plug.utils import get_all_addons
 
 LOG = logging.getLogger("gedcomforgeneanet")
 
@@ -1404,6 +1405,16 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._note_references(attr.get_note_list(), 2)
             self._source_references(attr.get_citation_list(), 2)
 
+    def _getgfgversion(self):
+        
+        self.addons = get_all_addons()
+        for plugin_dict in self.addons:
+            pid = plugin_dict["i"]
+            if pid == "Export GEDCOM for Geneanet":
+                result = str(plugin_dict["v"])
+                return result
+     
+        
     def _header(self, filename):
         """
         Write the GEDCOM header.
@@ -1443,7 +1454,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         time_str = "%02d:%02d:%02d" % (hour, minutes, sec)
         rname = self.dbase.get_researcher().get_name()
         LOG.debug("deb header %d" % self.relativepath)
-        VERS2 = VERSION + "-GedcomforGeneanet-2.1.12"
+        #VERS2 = VERSION + "-GedcomforGeneanet-2.1.12"
+        VERS2 = VERSION + "-GedcomforGeneanet-" + self._getgfgversion()
         self._writeln(0, "HEAD")
         self._writeln(1, "SOUR", "Gramps" )
         self._writeln(2, "VERS", VERS2)
