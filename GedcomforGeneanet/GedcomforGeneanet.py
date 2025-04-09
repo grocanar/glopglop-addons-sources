@@ -293,7 +293,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                             ).format(number_of=people_count) )
         return dbase
 
-    def _place(self, place, dateobj, level , ancplacename):
+    def _place(self, place, dateobj, level ):
         """
         PLACE_STRUCTURE:=
             n PLAC <PLACE_NAME> {1:1}
@@ -327,46 +327,20 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._writeln(level + 2, 'LATI', latitude)
             self._writeln(level + 2, 'LONG', longitude)
 
-        # The Gedcom standard shows that an optional address structure can
-        # be written out in the event detail.
-        # http://homepages.rootsweb.com/~pmcbride/gedcom/55gcch2.htm#EVENT_DETAIL
-        location = get_main_location(self.dbase, place)
-        street = location.get(PlaceType.STREET)
-        locality = location.get(PlaceType.LOCALITY)
-        city = location.get(PlaceType.CITY)
-        state = location.get(PlaceType.STATE)
-        country = location.get(PlaceType.COUNTRY)
-        postal_code = place.get_code()
-
-        if  street or locality or city or state or postal_code or country:
-            self._writeln(level, "ADDR", street)
-            if street:
-                self._writeln(level + 1, 'ADR1', street)
-            if locality:
-                self._writeln(level + 1, 'ADR2', locality)
-            if city:
-                self._writeln(level + 1, 'CITY', city)
-            if state:
-                self._writeln(level + 1, 'STAE', state)
-            if postal_code:
-                self._writeln(level + 1, 'POST', postal_code)
-            if country:
-                self._writeln(level + 1, 'CTRY', country)
-        if self.placegeneanet and self.ancplacename and ancplacename:
+        if self.placegeneanet and self.ancplacename:
             anc_name = displayer.display(self.dbase, place, dateobj)
             if anc_name != place_name:
                 place_name = _pd.display(self.dbase, place, dateobj)
                 text = _("Place name at the time") + " : "  + place_name
                 self._writeln(2, 'NOTE' , text )
-        if self.altname and ancplacename:
+        if self.altname:
             alt_names=self.display_alt_names(place)
             if len(alt_names) > 0:
                 text = _("Alternate name for place : ") + ' \n'.join(alt_names)
                 self._writeln(2, 'NOTE' , text )
         else:
             LOG.debug(" PAS PLACENOTE")
-        if ancplacename:
-            self._note_references(place.get_note_list(), level + 1)
+        self._note_references(place.get_note_list(), level + 1)
 
     def display_alt_names(self, place):
         """
@@ -774,7 +748,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             if event is None:
                 continue
             self._process_family_event(event, event_ref)
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref)
 
         level = 1
 #        self._writeln(level,"TEST")
@@ -989,7 +963,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(1, key, 'Y')
             if event.get_description().strip() != "":
                 self._writeln(2, 'TYPE', event.get_description())
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref)
 
         if self.include_witnesses and event_ref:
             role = int(event_ref.get_role())
@@ -1116,9 +1090,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         etype = int(event.get_type())
         if etype == EventType.NOB_TITLE:
-            self._dump_event_stats(event, event_ref,False)
+            self._dump_event_stats(event, event_ref)
         else:
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref)
         if etype == EventType.ADOPT and not adop_written:
             adop_written = True
             self._adoption_records(person, adop_written)
@@ -1227,9 +1201,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             else:
                 self._writeln(1, 'EVEN')
             self._writeln(2, 'TYPE', 'Titre')
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref)
 
-    def _dump_event_stats(self, event, event_ref,ancplace):
+    def _dump_event_stats(self, event, event_ref):
         """
         Write the event details for the event, using the event and event
         reference information.
@@ -1251,7 +1225,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         if event.get_place_handle():
             place = self.dbase.get_place_from_handle(event.get_place_handle())
-            self._place(place, dateobj, 2, ancplace)
+            self._place(place, dateobj, 2)
 
         for attr in event.get_attribute_list():
             attr_type = attr.get_type()
