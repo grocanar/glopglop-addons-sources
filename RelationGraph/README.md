@@ -1,6 +1,8 @@
 This addon is a proff of concept for using graph in GRAMPS.
 it s an alpha plugin to demonstrate the use of graph
 
+To use it you should install python-igraph 
+
 It create a dotfile of the relation beetween the Home person and the active person. 
 Here is the variable that should be set in the code
 
