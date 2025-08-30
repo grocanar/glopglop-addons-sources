@@ -739,7 +739,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
  
  
     def _packzip(self, path ):
-        if path:
+        if path and not path in self.zipfile.namelist():
             self.zipfile.write(path)
 
     def _family_events(self, family):
