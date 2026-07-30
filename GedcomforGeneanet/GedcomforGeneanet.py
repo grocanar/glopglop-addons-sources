@@ -1354,6 +1354,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             attr_type = int(attr.get_type())
             name = libgedcom.PERSONALCONSTANTATTRIBUTES.get(attr_type)
             key = str(attr.get_type())
+            raw_key = attr.get_type().xml_str()
             value = attr.get_value().strip().replace('\r', ' ')
 
             if key in ("AFN", "RFN", "REFN", "_UID", "_FSFTID"):
@@ -1363,6 +1364,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             if key == GROUPEGENEANET and self.grouptitle:
                 self._writeln(1, 'TITL', value )
                 continue
+
+            if raw_key == "Occupation":
+                self._writeln(1, "OCCU", value)
+                continue
+
             if key == "RESN":
                 self._writeln(1, 'RESN')
                 continue
