@@ -14,12 +14,12 @@ Ce greffon est une "amélioration" de l'export gedcom de Geneanet. Il apporte le
 * Ajout de la qualité des sources dans la description des sources
 * Création d'une archive zip des médias concernés
 * Suppression du support de la norme anychar du Gedcom 5.5
-* Gestion des noms usuels
+* Gestion du nom usuel
 * Export des attributs des citations
 * Export des informations de recensement d'un individu avec un format étendu optionnel
-* Export des lieux au format geneanet
-* Indication du nom du lieu à la date de l'événement
-* Indication des noms alternatifs des lieux
+* Mettre le nom des lieux au format Généanet
+* Afficher le nom du lieu à la date de l'événement
+* Afficher les noms alternatifs des lieux
 * Suppression de la structure adresse optionnelle
 * Gestion de l'affichage des titres de noblesses
 * Ajout des sources de filiations comme des Notes de l'individu
@@ -80,7 +80,7 @@ Cet attribut n'ayant pas d'intérêt celui est supprimé durant l'export.
 Geneanet n'implemente pas la norme anychar de la norme Gedcom5.3 qui impose de doubler les caractères @. Ainsi les dates exportés dans GRAMPS dans un calendrier alternatif ne sont pas bien rendues. Cette option permet de supprimer le doublement des @.
 
 
-### Gestion des noms usuels
+### Gestion du nom usuel
 
 Permet d'exporter le prénom usuel en l'indiquant entre ".
 
@@ -93,14 +93,14 @@ Permet d'exporter les attributs d'une citation. Cela permet par exemple d'indiqu
 Permet d'exporter pour un individu les informations dans un recensement sous formes de notes d'évenement.
 Si on sélectionne le format étendu celui va afficher non pas seulement les informations liés à l individu mais les informations de tous les individus du foyer. 
 
-###  Export des lieux au format geneanet
+###  Mettre le nom des lieux au format Généanet
 Geneanet impose un format pour les noms des lieux non compatible avec gramps. Cet option permet de generer le titre au format geneanet lors de l'export tout en conservant la génération automatique du titre dans GRAMPS.
 
-### Indication du nom du lieu à la date de l'événement
+### Afficher le nom du lieu à la date de l'événement
 
 Indique en note le nom du lieu à la date de l'événement.
 
-### Indication des noms alternatifs des lieux
+### Afficher les noms alternatifs des lieux
 
 Indique en note les noms alternatifs du lieu.
 
