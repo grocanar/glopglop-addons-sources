@@ -1465,6 +1465,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
     def _source_ref_record(self, level, citation_handle):
 
+        begindata=False
+        bigsize=4085
         citation = self.dbase.get_citation_from_handle(citation_handle)
 
         src_handle = citation.get_reference_handle()
@@ -1487,28 +1489,50 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         conf = min(citation.get_confidence_level(),
                    Citation.CONF_VERY_HIGH)
          
-        if self.quaynote:
-            if conf == Citation.CONF_VERY_HIGH:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Very High Quality Source"))
-            elif conf == Citation.CONF_HIGH:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("High Quality Source"))
-            elif conf == Citation.CONF_NORMAL:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Normal Quality Source"))
-            elif conf == Citation.CONF_LOW:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Low Quality Source"))
-            elif conf == Citation.CONF_VERY_LOW:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Very Low Quality Source"))
         if  conf != -1:
             self._writeln(level + 1, "QUAY", QUALITY_MAP[conf])
 
         if not citation.get_date_object().is_empty():
             self._writeln(level + 1, 'DATA')
+            begindata=True
             self._date(level + 2, citation.get_date_object())
+
+        if self.quaynote:
+            if conf == Citation.CONF_VERY_HIGH:
+                if begindata:
+                    self._writeln(level +2, "TEXT", _("Very High Quality Source"))
+                else:
+                    self._writeln(level +1, "DATA")
+                    self._writeln(level +2, "NOTE", _("Very High Quality Source"))
+                    begindata=True
+            elif conf == Citation.CONF_HIGH:
+                if begindata:
+                    self._writeln(level +2, "TEXT", _("High Quality Source"))
+                else:
+                    self._writeln(level +1, "DATA")
+                    self._writeln(level +2, "NOTE", _("High Quality Source"))
+                    begindata=True
+            elif conf == Citation.CONF_NORMAL:
+                if begindata:
+                    self._writeln(level +2, "TEXT", _("Normal Quality Source"))
+                else:
+                    self._writeln(level +1, "DATA")
+                    self._writeln(level +2, "NOTE", _("Normal Quality Source"))
+                    begindata=True
+            elif conf == Citation.CONF_LOW:
+                if begindata:
+                    self._writeln(level +2, "TEXT", _("Low Quality Source"))
+                else:
+                    self._writeln(level +1, "DATA")
+                    self._writeln(level +2, "NOTE", _("Low Quality Source"))
+                    begindata=True
+            elif conf == Citation.CONF_VERY_LOW:
+                if begindata:
+                    self._writeln(level +2, "TEXT", _("Very Low Quality Source"))
+                else:
+                    self._writeln(level +1, "DATA")
+                    self._writeln(level +2, "NOTE", _("Very Low Quality Source"))
+                    begindata=True
 
         if len(citation.get_note_list()) > 0:
 
@@ -1522,16 +1546,74 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             else:
                 ref_text = ""
 
-            if ref_text != "" and citation.get_date_object().is_empty():
+            if ref_text != "" and not begindata:
                 self._writeln(level + 1, 'DATA')
             if ref_text != "":
-                self._writeln(level + 2, "TEXT", ref_text)
+                self._writeln(level + 2, "TEXT", ref_text, limit = bigsize)
+            if self.citattr:
+                for citattr in citation.get_attribute_list():
+                    if self.urlshort:
+                        url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+                        link = re.match(url_pattern, citattr.value)
+                        if link:
+                            url=link.group()
+                            LOG.debug("deb write gedcom %s : %s  :" % ( str(url) , citattr.value ))
+                            text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\" target=_blank rel=noreferrer>" + str(citattr.type) + "</A>"
+                            if begindata:
+                                self._writeln(level + 2, "TEXT" , text ,limit = bigsize) 
+                            else:
+                                self._writeln(level + 1, "DATA" , text , limit = bigsize) 
+                        else:
+                            if begindata:
+                                self._writeln(level + 1, "DATA", str(citattr.type))
+                                self._writeln(level + 2, "TEXT", citattr.value , limit = bigsize)
+                            else:
+                                self._writeln(level + 2, "TEXT", str(citattr.type))
+                                self._writeln(level + 2, "TEXT", citattr.value,limit = bigsize)
+                    else:
+                        if begindata:
+                            self._writeln(level + 1, "DATA", str(citattr.type))
+                            self._writeln(level + 2, "TEXT", citattr.value , limit = bigsize)
+                        else:
+                            self._writeln(level + 2, "TEXT", str(citattr.type))
+                            self._writeln(level + 2, "TEXT", citattr.value , limit = bigsize)
+                
 
             note_list = [self.dbase.get_note_from_handle(h)
                          for h in citation.get_note_list()]
             note_list = [n.handle for n in note_list
                          if n and n.get_type() != NoteType.SOURCE_TEXT]
             self._note_references(note_list, level + 1)
+
+        elif self.citattr:
+            for citattr in citation.get_attribute_list():
+                if self.urlshort:
+                    url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+                    link = re.match(url_pattern, citattr.value)
+                    if link:
+                        url=link.group()
+                        LOG.debug("deb write gedcom %s : %s  :" % ( str(url) , citattr.value ))
+                        text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\" target=_blank rel=noreferrer>" + str(citattr.type) + "</A>"
+                        if begindata:
+                            self._writeln(level + 2, "TEXT" , text , limit = bigsize)
+                        else:
+                            self._writeln(level + 1, "DATA" , text , limit = bigsize) 
+                    else:
+                        if begindata:
+                            self._writeln(level + 1, "DATA", str(citattr.type))
+                            self._writeln(level + 2, "TEXT", citattr.value , limit = bigsize)
+                        else:
+                            self._writeln(level + 2, "TEXT", str(citattr.type))
+                            self._writeln(level + 2, "TEXT", citattr.value , limit = bigsize)
+                else:
+                    if begindata:
+                        self._writeln(level + 1, "DATA", str(citattr.type))
+                        self._writeln(level + 2, "TEXT", citattr.value , limit = bigsize)
+                    else:
+                        self._writeln(level + 2, "TEXT", str(citattr.type))
+                        self._writeln(level + 2, "TEXT", citattr.value , limit = bigsize)
+
+                
 
         self._photos(citation.get_media_list(), level + 1)
 
@@ -1546,23 +1628,6 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 if str(srcattr.type) == "EVEN:ROLE":
                     self._writeln(level + 2, "ROLE", srcattr.value)
                     break
-        if self.citattr:
-            for citattr in citation.get_attribute_list():
-                if self.urlshort:
-                    url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
-                    link = re.match(url_pattern, citattr.value)
-                    if link:
-                        url=link.group()
-                        LOG.debug("deb write gedcom %s : %s  :" % ( str(url) , citattr.value ))
-                        text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\" target=_blank rel=noreferrer>" + str(citattr.type) + "</A>"
-                        self._writeln(level + 1, "DATA" , text) 
-                    else:
-                        self._writeln(level + 1, "DATA", str(citattr.type))
-                        self._writeln(level + 2, "TEXT", citattr.value)
-                else:
-                    self._writeln(level + 1, "DATA", str(citattr.type))
-                    self._writeln(level + 2, "TEXT", citattr.value)
-                
     def write_gedcom_file(self, filename):
         """
         Write the actual GEDCOM file to the specified filename.
