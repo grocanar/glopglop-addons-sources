@@ -779,7 +779,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             if event is None:
                 continue
             if ((int(family.get_relationship()) == FamilyRelType.CIVIL_UNION) and int(event.get_type()) == EventType.MARR_ALT):
-                event.set_type ("union civile")
+                event.set_type ("pacs")
                 MarrEventsCount+=1
             elif ((int(family.get_relationship()) == FamilyRelType.UNMARRIED) and int(event.get_type()) == EventType.MARR_ALT):
                 event.set_type (EventType.MARRIAGE)
