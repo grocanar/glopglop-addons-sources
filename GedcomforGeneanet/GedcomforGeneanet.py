@@ -140,6 +140,9 @@ CONFIG.register("preferences.ancplacename", True)
 CONFIG.register("preferences.extendedtitle", True)
 CONFIG.register("preferences.grouptitle", True)
 CONFIG.register("preferences.extprog", True)
+#ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
+CONFIG.register("preferences.keepnoteformat", True)
+#ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
 CONFIG.load()
 GROUPEGENEANET  = "Groupe Geneanet"
 
@@ -212,6 +215,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self.ancplacename = option_box.ancplacename
             self.extendedtitle = option_box.extendedtitle
             self.grouptitle = option_box.grouptitle
+            #ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
+            self.keepnoteformat = option_box.keepnoteformat
+            #ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
             CONFIG.save()
         else:
             LOG.debug("pas dans OPTION %s")
@@ -236,6 +242,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self.ancplacename = 0
             self.extendedtitle = 0
             self.grouptitle = 0
+            #ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
+            self.keepnoteformat = 0
+            #ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
             self.title = 0
         self.zipfile = None
         self.limit = 0
@@ -356,7 +365,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         if addExtraInfos:
             notelist = place.get_note_list()
             if notelist:
-                text = "Notes" + " : " #l'idéal serait d'ajouter un Texte par exemple : Notes sur le lieu
+                text = _("Notes sur ce lieu") + " : "
                 self._writeln(level, 'NOTE' , text )
                 self._note_references(notelist, level)
         #ERO end correction ne pas ajouter les notes pour les NOB_TITLE
@@ -1061,7 +1070,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         +1 <<CHANGE_DATE>> {0:1}
         """
         if note:
-            self._writeln(0, "@%s@" % note.get_gramps_id(), "NOTE " + self.get_note_format(note))
+            if self.keepnoteformat:
+                self._writeln(0, "@%s@" % note.get_gramps_id(), "NOTE " + self.get_note_format(note))
+            else:
+                self._writeln(0, "@%s@" % note.get_gramps_id(), "NOTE " + note.get())
 #ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
 
  
@@ -1432,7 +1444,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     val = str(attr.get_value())
                     text = typ + " : " + val
                     self._writeln(3,'DATA', text )
-        if addExtraInfos:    
+        if addExtraInfos:
             self._note_references(event.get_note_list(), 2)
             self._note_references(event_ref.get_note_list(), 2)
             self._source_references(event.get_citation_list(), 2)
@@ -1631,7 +1643,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
             if note_list:
 #ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
-                ref_text = note_list[0].get_note_format()
+                if self.keepnoteformat:
+                    ref_text = note_list[0].get_note_format()
+                else:
+                    ref_text = note_list[0].get()
 #ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
             else:
                 ref_text = ""
@@ -1768,7 +1783,11 @@ class GedcomWriterOptionBox(WriterOptionBox):
         self.parentsrc_check = None
         self.extprog = CONFIG.get("preferences.extprog")
         self.extprog_check = None
-
+        #ERO begin ajout param conservation formatage
+        self.keepnoteformat = CONFIG.get("preferences.keepnoteformat")
+        self.keepnoteformat_check = None
+        #ERO end ajout param conservation formatage
+        
     def get_option_box(self):
         option_box = super(GedcomWriterOptionBox, self).get_option_box()
         # Make options:
@@ -1793,7 +1812,11 @@ class GedcomWriterOptionBox(WriterOptionBox):
         self.ancplacename_check = Gtk.CheckButton(_("Display place name at the time"))
         self.extendedtitle_check = Gtk.CheckButton(_("Display Extended Title"))
         self.grouptitle_check = Gtk.CheckButton(_("Create group from attribute"))
-        #self.include_witnesses_check.set_active(1)
+        #ERO begin ajout param conservation formatage
+        self.keepnoteformat_check = Gtk.CheckButton(_("Keep Gramps notes format"))
+        #ERO end ajout param conservation formatage
+
+
         self.include_witnesses_check.set_active(CONFIG.get("preferences.include_witnesses"))
         self.include_media_check.set_active(CONFIG.get("preferences.include_media"))
         self.include_depot_check.set_active(CONFIG.get("preferences.include_depot"))
@@ -1815,6 +1838,9 @@ class GedcomWriterOptionBox(WriterOptionBox):
         self.ancplacename_check.set_active(CONFIG.get("preferences.ancplacename"))
         self.extendedtitle_check.set_active(CONFIG.get("preferences.extendedtitle"))
         self.grouptitle_check.set_active(CONFIG.get("preferences.grouptitle"))
+        #ERO begin ajout param conservation formatage
+        self.keepnoteformat_check.set_active(CONFIG.get("preferences.keepnoteformat"))
+        #ERO end ajout param conservation formatage
 
         # Add to gui:
         # Add to gui:
@@ -1845,6 +1871,9 @@ class GedcomWriterOptionBox(WriterOptionBox):
         vbox2.pack_start(self.ancplacename_check, False, False, 0)
         vbox2.pack_start(self.extendedtitle_check, False, False, 0)
         vbox2.pack_start(self.grouptitle_check, False, False, 0)
+        #ERO begin ajout param conservation formatage
+        vbox2.pack_start(self.keepnoteformat_check, False, False, 0)
+        #ERO end ajout param conservation formatage
         return option_box
 
 
@@ -1895,7 +1924,11 @@ class GedcomWriterOptionBox(WriterOptionBox):
             self.extendedtitle = self.extendedtitle_check.get_active()
         if self.grouptitle_check:
             self.grouptitle = self.grouptitle_check.get_active()
-
+        #ERO begin ajout param conservation formatage
+        if self.keepnoteformat_check:
+            self.keepnoteformat = self.keepnoteformat_check.get_active()
+        #ERO end ajout param conservation formatage
+        
         CONFIG.set("preferences.include_witnesses" , self.include_witnesses )
         CONFIG.set("preferences.include_media" , self.include_media)
         CONFIG.set("preferences.include_depot" , self.include_depot)
@@ -1917,6 +1950,9 @@ class GedcomWriterOptionBox(WriterOptionBox):
         CONFIG.set("preferences.ancplacename" , self.ancplacename)
         CONFIG.set("preferences.extendedtitle" , self.extendedtitle)
         CONFIG.set("preferences.grouptitle" , self.grouptitle)
+        #ERO begin ajout param conservation formatage
+        CONFIG.set("preferences.keepnoteformat" , self.keepnoteformat)
+        #ERO end ajout param conservation formatage
         CONFIG.save()
 
 def export_data(database, filename, user, option_box=None):
