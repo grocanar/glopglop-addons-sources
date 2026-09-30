@@ -71,6 +71,9 @@ except ImportError:
 else:
     IsAbleExtprog=True
 from gramps.gen.plug.utils import get_all_addons
+#ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
+from gramps.plugins.lib.libhtmlbackend import HtmlBackend, process_spaces
+#ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
 
 LOG = logging.getLogger("gedcomforgeneanet")
 
@@ -236,6 +239,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self.title = 0
         self.zipfile = None
         self.limit = 0
+        #ERO begin - ajout pour conserver le formattage des notes dans l'export GEDCOM
+        self._backend = HtmlBackend()
+        #ERO end - ajout pour conserver le formattage des notes dans l'export GEDCOM
         print("EXTPROG avant try %s" % str(self.extprog))
         if not IsAbleExtprog:
             self.extprog=0
@@ -293,7 +299,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                             ).format(number_of=people_count) )
         return dbase
 
-    def _place(self, place, dateobj, level ):
+    def _place(self, place, dateobj, level, addExtraInfos ):
         """
         PLACE_STRUCTURE:=
             n PLAC <PLACE_NAME> {1:1}
@@ -327,20 +333,33 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._writeln(level + 2, 'LATI', latitude)
             self._writeln(level + 2, 'LONG', longitude)
 
-        if self.placegeneanet and self.ancplacename:
+        if self.placegeneanet and self.ancplacename and addExtraInfos:
             anc_name = displayer.display(self.dbase, place, dateobj)
             if anc_name != place_name:
                 place_name = _pd.display(self.dbase, place, dateobj)
                 text = _("Place name at the time") + " : "  + place_name
-                self._writeln(2, 'NOTE' , text )
-        if self.altname:
+                #ERO begin correction du level pour afficher les notes de lieu au bon niveau
+                self._writeln(level, 'NOTE' , text )
+                #ERO end correction du level pour afficher les notes de lieu au bon niveau
+        if self.altname and addExtraInfos:
             alt_names=self.display_alt_names(place)
             if len(alt_names) > 0:
-                text = _("Alternate name for place : ") + ' \n'.join(alt_names)
-                self._writeln(2, 'NOTE' , text )
+                #ERO begin
+                text = _("Alternate name for place") + " : " + '\n'.join(alt_names)
+                #ERO end
+                #ERO begin correction du level pour afficher les notes de lieu au bon niveau
+                self._writeln(level, 'NOTE' , text )
+                #ERO end correction du level pour afficher les notes de lieu au bon niveau
         else:
             LOG.debug(" PAS PLACENOTE")
-        self._note_references(place.get_note_list(), level + 1)
+        #ERO begin correction ne pas ajouter les notes pour les NOB_TITLE
+        if addExtraInfos:
+            notelist = place.get_note_list()
+            if notelist:
+                text = "Notes" + " : " #l'idéal serait d'ajouter un Texte par exemple : Notes sur le lieu
+                self._writeln(level, 'NOTE' , text )
+                self._note_references(notelist, level)
+        #ERO end correction ne pas ajouter les notes pour les NOB_TITLE
 
     def display_alt_names(self, place):
         """
@@ -743,17 +762,38 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self.zipfile.write(path)
 
     def _family_events(self, family):
+        #ERO begin proposition de gestion des différents types d'union - par exmple le PACS Français
+        MarrEventsCount = 0
+        level = 1
         for event_ref in family.get_event_ref_list():
             event = self.dbase.get_event_from_handle(event_ref.ref)
             if event is None:
                 continue
+            if ((int(family.get_relationship()) == FamilyRelType.CIVIL_UNION) and int(event.get_type()) == EventType.MARR_ALT):
+                event.set_type ("union civile")
+                MarrEventsCount+=1
+            elif ((int(family.get_relationship()) == FamilyRelType.UNMARRIED) and int(event.get_type()) == EventType.MARR_ALT):
+                event.set_type (EventType.MARRIAGE)
+                MarrEventsCount+=1
+            elif ((int(family.get_relationship()) == FamilyRelType.UNKNOWN) and int(event.get_type()) == EventType.MARR_ALT):
+                event.set_type ("nomen")
+                MarrEventsCount+=1
             self._process_family_event(event, event_ref)
-            self._dump_event_stats(event, event_ref)
+            self._dump_event_stats(event, event_ref,True)
+            level = 1
+            #ERO - voir cette page pour explications https://fr.geneawiki.com/wiki/Import_Gedcom_-_gestion_des_couples_non_maries
+            if (int(family.get_relationship()) == FamilyRelType.UNMARRIED):
+              level = 2
+              self._writeln(level, "PLAC unmarried")
+        if (MarrEventsCount == 0):
+           if (int(family.get_relationship()) == FamilyRelType.UNKNOWN):
+              self._writeln(1, "EVEN")
+              self._writeln(2, "TYPE nomen")
+           elif (int(family.get_relationship()) == FamilyRelType.UNMARRIED):
+              self._writeln(1, "MARR")
+              self._writeln(2, "PLAC unmarried")
+        #ERO end proposition de gestion des différents types d'union - par exmple le PACS Français
 
-        level = 1
-#        self._writeln(level,"TEST")
-        if (int(family.get_relationship()) == FamilyRelType.UNMARRIED or int(family.get_relationship()) == FamilyRelType.UNKNOWN):
-            self._writeln(level, "_UST", "COHABITATION")
     
 # Workaround pour geneanet upload
 #    def _url_list(self, obj, level):
@@ -949,6 +989,81 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._note_references(source.get_note_list(), 1)
             self._change(source.get_change_time(), 1)
 
+#ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
+    def get_note_format(self, note):
+        """
+        will get the note from the database, and will return either the
+        styled text or plain note
+        @param: note   -- the note to process
+        """
+        text = ""
+        if note is not None:
+            # retrieve the body of the note
+            note_text = note.get()
+            # styled notes
+            htmlnotetext = self.styled_note(
+                note.get_styledtext(),
+                note.get_format(),
+                contains_html=(note.get_type() == NoteType.HTML_CODE),
+            )
+            text = htmlnotetext or note_text
+        # return text of the note to its callers
+        return text
+        
+    def styled_note(self, styledtext, styled_format, contains_html=False):
+        """
+        @param: styledtext    --  assumed a StyledText object to write
+        @param: styled_format --  = 0 : Flowed, = 1 : Preformatted
+        @param: style_name    --  name of the style to use for default
+                                  presentation
+        """
+        text = str(styledtext)
+        if not text:
+            return ""
+        s_tags = styledtext.get_tags()
+        OutText=""
+        if contains_html:
+            markuptext = self._backend.add_markup_from_styled(
+                text, s_tags, split="\n", escape=False
+            )
+            OutText += markuptext
+        else:
+            markuptext = self._backend.add_markup_from_styled(text, s_tags, split="\n")
+            linenb = 1
+            for line in markuptext.split("\n"):
+                if linenb > 1:
+                    OutText += "<br />"
+                [line, sigcount] = process_spaces(line, styled_format)
+                if sigcount == 0:
+                    # The rendering of an empty paragraph '<p></p>'
+                    # is undefined so we use a non-breaking space
+                    OutText += "&nbsp;"
+                else:
+                    OutText += line;
+                linenb += 1
+            # if the last line was blank, then as well as outputting
+            # the previous para, which we have just done,
+            # we also output a new blank para
+            if sigcount == 0:
+                OutText += "&nbsp;"
+            if linenb > 1:
+                OutText += "<br />"
+        return OutText
+        
+    def _note_record(self, note):
+        """
+        n @<XREF:NOTE>@ NOTE <SUBMITTER_TEXT> {1:1}
+        +1 [ CONC | CONT] <SUBMITTER_TEXT> {0:M}
+        +1 <<SOURCE_CITATION>> {0:M}
+        +1 REFN <USER_REFERENCE_NUMBER> {0:M}
+        +2 TYPE <USER_REFERENCE_TYPE> {0:1}
+        +1 RIN <AUTOMATED_RECORD_ID> {0:1}
+        +1 <<CHANGE_DATE>> {0:1}
+        """
+        if note:
+            self._writeln(0, "@%s@" % note.get_gramps_id(), "NOTE " + self.get_note_format(note))
+#ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
+
  
     def _person_event_ref(self, key, event_ref):
         """
@@ -963,7 +1078,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(1, key, 'Y')
             if event.get_description().strip() != "":
                 self._writeln(2, 'TYPE', event.get_description())
-            self._dump_event_stats(event, event_ref)
+            self._dump_event_stats(event, event_ref,True)
 
         if self.include_witnesses and event_ref:
             role = int(event_ref.get_role())
@@ -1090,9 +1205,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         etype = int(event.get_type())
         if etype == EventType.NOB_TITLE:
-            self._dump_event_stats(event, event_ref)
+            self._dump_event_stats(event, event_ref,False)
         else:
-            self._dump_event_stats(event, event_ref)
+            self._dump_event_stats(event, event_ref,True)
         if etype == EventType.ADOPT and not adop_written:
             adop_written = True
             self._adoption_records(person, adop_written)
@@ -1201,9 +1316,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             else:
                 self._writeln(1, 'EVEN')
             self._writeln(2, 'TYPE', 'Titre')
-            self._dump_event_stats(event, event_ref)
+            self._dump_event_stats(event, event_ref,True)
 
-    def _dump_event_stats(self, event, event_ref):
+    def _dump_event_stats(self, event, event_ref,addExtraInfos):
         """
         Write the event details for the event, using the event and event
         reference information.
@@ -1225,7 +1340,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         if event.get_place_handle():
             place = self.dbase.get_place_from_handle(event.get_place_handle())
-            self._place(place, dateobj, 2)
+            self._place(place, dateobj, 2,addExtraInfos)
 
         for attr in event.get_attribute_list():
             attr_type = attr.get_type()
@@ -1317,17 +1432,14 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     val = str(attr.get_value())
                     text = typ + " : " + val
                     self._writeln(3,'DATA', text )
-            
-        self._note_references(event.get_note_list(), 2)
-        self._note_references(event_ref.get_note_list(), 2)
-
-        self._source_references(event.get_citation_list(), 2)
-        self._source_references(event_ref.get_citation_list(), 2)
-
-        self._photos(event.get_media_list(), 2)
-
-        if place:
-            self._photos(place.get_media_list(), 2)
+        if addExtraInfos:    
+            self._note_references(event.get_note_list(), 2)
+            self._note_references(event_ref.get_note_list(), 2)
+            self._source_references(event.get_citation_list(), 2)
+            self._source_references(event_ref.get_citation_list(), 2)
+            self._photos(event.get_media_list(), 2)
+            if place:
+                self._photos(place.get_media_list(), 2)
     
 
     def _attributes(self, person):
@@ -1518,7 +1630,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                          if n.get_type() == NoteType.SOURCE_TEXT]
 
             if note_list:
-                ref_text = note_list[0].get()
+#ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
+                ref_text = note_list[0].get_note_format()
+#ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
             else:
                 ref_text = ""
 
@@ -1781,7 +1895,7 @@ class GedcomWriterOptionBox(WriterOptionBox):
             self.extendedtitle = self.extendedtitle_check.get_active()
         if self.grouptitle_check:
             self.grouptitle = self.grouptitle_check.get_active()
-        CONFIG.set("preferences.include_witnesses" , self.include_witnesses )
+
         CONFIG.set("preferences.include_witnesses" , self.include_witnesses )
         CONFIG.set("preferences.include_media" , self.include_media)
         CONFIG.set("preferences.include_depot" , self.include_depot)
