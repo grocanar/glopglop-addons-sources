@@ -272,7 +272,12 @@ class PlaceDisplayGeneanet(place.PlaceDisplay):
             return  self._find_populated_place(places,place,postal_code)
 
     def _find_postal_code(self,db,place,visited):
-        postal_code = place.get_code()
+        #ERO begin corrige issue #3 les codes postaux- ne pas recuperer les codes de pays ou de regions
+        postal_code = ""
+        place_type = place.get_type()
+        if place_type in [PlaceType.BOROUGH, PlaceType.CITY, PlaceType.VILLAGE,PlaceType.TOWN , PlaceType.MUNICIPALITY, PlaceType.NEIGHBORHOOD, PlaceType.LOCALITY, PlaceType.PARISH]:
+            postal_code = place.get_code()
+        #ERO end corrige les codes postaux- ne pas recuperer les codes de pays ou de regions
         if postal_code:
             return postal_code
         else:
@@ -296,14 +301,19 @@ class PlaceDisplayGeneanet(place.PlaceDisplay):
                     populated_place = "[ " + item[0]
                 else :
                     populated_place = populated_place + " - " + item[0] 
-            elif int(item[1]) in [PlaceType.CITY, PlaceType.VILLAGE,
-                            PlaceType.TOWN , PlaceType.MUNICIPALITY]:
-                level = 2
+            #ERO begin  issue #3 ajout des codes selon le niveau rencontre
+            elif int(item[1]) in [PlaceType.CITY, PlaceType.VILLAGE,PlaceType.TOWN , PlaceType.MUNICIPALITY]:
                 if populated_place == "":
                     populated_place = item[0]
+                    populated_place = populated_place + ", "  + postal_code
                 else:
-                    populated_place = populated_place + " ] - " + item[0]
-                populated_place = populated_place + ", "  + postal_code
+                    if level == 1:
+                        populated_place = populated_place + " ] - " + item[0]
+                        populated_place = populated_place + ", "  + postal_code
+                    else:
+                        populated_place = populated_place + ", " + item[0]
+                level = 2
+            #ERO end ajout des codes selon le niveau rencontre
             elif int(item[1]) in [PlaceType.COUNTY, PlaceType.DEPARTMENT ]:
                 if populated_place == "":
                     populated_place = item[0]
@@ -337,6 +347,10 @@ class PlaceDisplayGeneanet(place.PlaceDisplay):
                     else:
                         populated_place = populated_place + ", " + item[0]
                     level = 5
+        #ERO begin  issue #3 si il n'y a qu'un niveau, il faut fermer le ]
+        if level == 1:
+           populated_place = populated_place + " ]"
+        #ERO end si il n'y a qu'un niveau, il faut fermer le ]
         return populated_place
 
 class ComputeRelation:
