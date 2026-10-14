@@ -1397,12 +1397,12 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                         RES[hdl][typ]=val
                                         LOG.debug("PLUS TYPE %s VAL %s" % ( typ, val))
                 if len(RES.keys()):
-                    heads=1
+                    heads = 1
                     self._writeln(2, 'NOTE', '<TABLE border=1>' )
-                    RANGSORT=dict(sorted(RANG.items(), key=lambda x:x[1]))
+                    RANGSORT = dict(sorted(RANG.items(), key=lambda x : x[1]))
                     for p in RANGSORT.keys():
-                        msg="<TR>"
-                        header="<TR>"
+                        msg = "<TR>"
+                        header = "<TR>"
                         for typ in HEADS:
                             if heads:
                                 header=header + "<TH>" + typ + "</TH>"
