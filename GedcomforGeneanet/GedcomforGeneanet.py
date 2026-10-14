@@ -1081,7 +1081,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         Write the witnesses associated with the birth and death event.
         based on http://www.geneanet.org/forum/index.php?topic=432352.0&lang=fr
         """
-        if event_ref:
+
+        if not event_ref:
+            return
+        event = None
+        if True:
             event = self.dbase.get_event_from_handle(event_ref.ref)
             if event_has_subordinate_data(event, event_ref):
                 self._writeln(1, key)
@@ -1091,11 +1095,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(2, 'TYPE', event.get_description())
             self._dump_event_stats(event, event_ref, True)
 
-        if self.include_witnesses and event_ref:
+        if self.include_witnesses:
             role = int(event_ref.get_role())
             if role != EventRoleType.PRIMARY:
                 return
-            event = self.dbase.get_event_from_handle(event_ref.ref)
+            # reuse `event` fetched above; no second get_event_from_handle
             for (objclass, handle) in self.dbase.find_backlink_handles(
                 event.handle, ['Person']):
                 person = self.dbase.get_person_from_handle(handle)
