@@ -143,7 +143,7 @@ CONFIG.register("preferences.extprog", True)
 CONFIG.register("preferences.keepnoteformat", True)
 #ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
 CONFIG.load()
-GROUPEGENEANET  = "Groupe Geneanet"
+GROUPEGENEANET = "Groupe Geneanet"
 
 #-------------------------------------------------------------------------
 #
@@ -345,7 +345,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             anc_name = displayer.display(self.dbase, place, dateobj)
             if anc_name != place_name:
                 place_name = _pd.display(self.dbase, place, dateobj)
-                text = _("Place name at the time") + " : "  + place_name
+                text = _("Place name at the time") + " : " + place_name
                 #ERO begin correction du level pour afficher les notes de lieu au bon niveau
                 self._writeln(level, 'NOTE', text)
                 #ERO end correction du level pour afficher les notes de lieu au bon niveau
@@ -640,7 +640,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         """
         Returns a GEDCOM-formatted name.
         """
-        num  = 0
+        num = 0
         NotTrouve = True
         if self.nameus:
            firstname = self.get_usuel_first_name(name)
