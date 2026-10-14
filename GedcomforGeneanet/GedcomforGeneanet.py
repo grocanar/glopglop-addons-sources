@@ -790,14 +790,14 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._dump_event_stats(event, event_ref,True)
             level = 1
             #ERO - voir cette page pour explications https://fr.geneawiki.com/wiki/Import_Gedcom_-_gestion_des_couples_non_maries
-            if (int(family.get_relationship()) == FamilyRelType.UNMARRIED):
+            if int(family.get_relationship()) == FamilyRelType.UNMARRIED:
               level = 2
               self._writeln(level, "PLAC unmarried")
-        if (MarrEventsCount == 0):
-           if (int(family.get_relationship()) == FamilyRelType.UNKNOWN):
+        if MarrEventsCount == 0:
+           if int(family.get_relationship()) == FamilyRelType.UNKNOWN:
               self._writeln(1, "EVEN")
               self._writeln(2, "TYPE nomen")
-           elif (int(family.get_relationship()) == FamilyRelType.UNMARRIED):
+           elif int(family.get_relationship()) == FamilyRelType.UNMARRIED:
               self._writeln(1, "MARR")
               self._writeln(2, "PLAC unmarried")
         #ERO end proposition de gestion des différents types d'union - par exmple le PACS Français
@@ -1102,7 +1102,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 if person:
                     for ref in person.get_event_ref_list():
                         devel = 2
-                        if (ref.ref == event.handle):
+                        if ref.ref == event.handle:
                             role = int(ref.get_role())
                             if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE ,EventRoleType.CLERGY, EventRoleType.AIDE,EventRoleType.FAMILY,EventRoleType.CUSTOM]:
                                 level = 2
@@ -1227,8 +1227,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     person2 = self.dbase.get_person_from_handle(handle)
                     if person2 and person2 != person:
                         for ref in person2.get_event_ref_list():
-                            if (ref.ref == event.handle):
-                                if (int(ref.get_role()) == EventRoleType.CUSTOM):
+                            if ref.ref == event.handle:
+                                if int(ref.get_role()) == EventRoleType.CUSTOM:
                                     level = 1
                                     if str(ref.role) == "Mentionnée" or str(ref.role) == "Mentionné":
                                         self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
@@ -1270,7 +1270,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     person2 = self.dbase.get_person_from_handle(handle)
                     if person2 and person != person2:
                         for ref in person2.get_event_ref_list():
-                            if (ref.ref == event.handle):
+                            if ref.ref == event.handle:
                                 role=int(ref.get_role())
                                 if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE, EventRoleType.FAMILY, EventRoleType.CUSTOM]:
                                     level = 2
