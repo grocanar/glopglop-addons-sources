@@ -114,6 +114,24 @@ NEEDS_PARAMETER = set(
     ["CAST", "DSCR", "EDUC", "IDNO", "NATI", "NCHI",
      "NMR", "OCCU", "PROP", "RELI", "SSN", "TITL"])
 
+# Roles that produce an ASSO block outside the baptism special case.
+# (CLERGY/CELEBRANT/AIDE/FAMILY/CUSTOM share one layout, INFORMANT and WITNESS
+# have their own.)
+ASSO_GROUP_ROLES = frozenset([
+    EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY,
+    EventRoleType.FAMILY, EventRoleType.CUSTOM])
+ASSO_ROLES = ASSO_GROUP_ROLES | frozenset([
+    EventRoleType.INFORMANT, EventRoleType.WITNESS])
+
+# Localised French role labels -> GEDCOM RELA value
+ROLE_LABEL_TO_RELA = {
+    "Mentionnée": "Mentioned",
+    "Mentionné": "Mentioned",
+    "Présence": "Attending",
+    "Parrain": "GodFather",
+    "Marraine": "GodMother",
+}
+
 GRAMPLET_CONFIG_NAME = "gedcomforgeneanet"
 CONFIG = config.register_manager("gedcomforgeneanet")
 
@@ -1076,12 +1094,108 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 #ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
 
 
+    # ------------------------------------------------------------ the index
+    def _event_person_index(self):
+        """
+        Return {event_handle: [(gramps_id, person_handle, int_role), ...]}
+        covering every event reference of every person visible through
+        self.dbase.  Built once per database object (i.e. once per export).
+
+        iter_people() is only used to *find candidates*; every candidate is
+        re-fetched with get_person_from_handle() before anything is written,
+        so privacy sanitising is still applied to what ends up in the file.
+        """
+        if getattr(self, "_ev_index_db", None) is not self.dbase:
+            index = defaultdict(list)
+            for person in self.dbase.iter_people():
+                phandle = person.get_handle()
+                gid = person.get_gramps_id()
+                for ref in person.get_event_ref_list():
+                    index[ref.ref].append((gid, phandle, int(ref.get_role())))
+            self._ev_index = index
+            self._ev_index_db = self.dbase
+        return self._ev_index
+
+    def _witness_candidates(self, event_handle, owner_handle=None, roles=None):
+        """
+        Yield (filtered) Person objects other than `owner_handle` that have an
+        event reference to `event_handle` with a role in `roles`
+        (any role if roles is None).  Each person is yielded once.
+        """
+        entries = self._event_person_index().get(event_handle)
+        if not entries:
+            return
+        seen = set()
+        for gid, phandle, role in sorted(entries):
+            if phandle == owner_handle or phandle in seen:
+                continue
+            if roles is not None and role not in roles:
+                continue
+            seen.add(phandle)
+            person2 = self.dbase.get_person_from_handle(phandle)
+            if person2:
+                yield person2
+
+    # -------------------------------------------------- ASSO writers (same
+    # -------------------------------------------------- layout as before)
+    def _write_simple_asso(self, person2, ref, level, rela):
+        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
+        self._writeln(level + 1, "TYPE", "INDI")
+        self._writeln(level + 1, "RELA", rela)
+        self._note_references(ref.get_note_list(), level + 1)
+
+    def _write_group_asso(self, person2, ref, level, role):
+        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
+        self._writeln(level + 1, "TYPE", "INDI")
+        rela = ROLE_LABEL_TO_RELA.get(str(ref.role))
+        if rela:
+            self._writeln(level + 1, "RELA", rela)
+        else:
+            self._writeln(level + 1, "RELA", "Other")
+            if self.extended_role:
+                rol = role + 1
+                if role:
+                    self._writeln(level + 1, "NOTE",
+                                  '\xA0%s' % EventRoleType._DATAMAP[rol][1])
+                else:
+                    self._writeln(level + 1, "NOTE", '\xA0%s' % str(ref.role))
+        self._note_references(ref.get_note_list(), level + 1)
+
+    def _write_asso_for_ref(self, person2, ref):
+        """ASSO for a non-baptism event (eg: births, deaths, others)."""
+        role = int(ref.get_role())
+        if role in ASSO_GROUP_ROLES:
+            self._write_group_asso(person2, ref, 2, role)
+        elif role == EventRoleType.INFORMANT:
+            self._write_simple_asso(person2, ref, 2, "Informant")
+        elif role == EventRoleType.WITNESS:
+            self._write_simple_asso(person2, ref, 2, "Witness")
+
+    def _write_baptism_asso(self, person2, ref):
+        """ASSO for BAPTISM / CHRISTEN events (godparents etc.)."""
+        if int(ref.get_role()) == EventRoleType.CUSTOM:
+            level = 1
+            self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
+            self._writeln(level + 1, "TYPE", "INDI")
+            rela = ROLE_LABEL_TO_RELA.get(str(ref.role))
+            if rela:
+                self._writeln(level + 1, "RELA", rela)
+            elif person2.get_gender() == Person.MALE:
+                self._writeln(level + 1, "RELA", "Godfather")
+            elif person2.get_gender() == Person.FEMALE:
+                self._writeln(level + 1, "RELA", "Godmother")
+            else:
+                self._writeln(level + 1, "RELA", "Unknown")
+            self._note_references(ref.get_note_list(), level + 1)
+        else:
+            self._write_simple_asso(person2, ref, 2, "Witness")
+
+
     def _person_event_ref(self, key, event_ref):
         """
         Write the witnesses associated with the birth and death event.
         based on http://www.geneanet.org/forum/index.php?topic=432352.0&lang=fr
         """
-
         if not event_ref:
             return
         event = None
@@ -1099,57 +1213,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             if int(event_ref.get_role()) != EventRoleType.PRIMARY:
                 return
             # reuse `event` fetched above; no second get_event_from_handle
-            for (objclass, handle) in self.dbase.find_backlink_handles(
-                event.handle, ['Person']):
-                person = self.dbase.get_person_from_handle(handle)
-                if person:
-                    for ref in person.get_event_ref_list():
-                        devel = 2
-                        if ref.ref == event.handle:
-                            role = int(ref.get_role())
-                            if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE, EventRoleType.FAMILY, EventRoleType.CUSTOM]:
-                                level = 2
-                                rol = role + 1
-                                if str(ref.role) == "Mentionnée" or str(ref.role) == "Mentionné":
-                                    self._writeln(level, "ASSO", "@%s@" % person.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "Mentioned")
-                                elif str(ref.role) == "Présence":
-                                    self._writeln(level, "ASSO", "@%s@" % person.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "Attending")
-                                elif str(ref.role) == "Parrain":
-                                    self._writeln(level, "ASSO", "@%s@" % person.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "GodFather")
-                                elif str(ref.role) == "Marraine":
-                                    self._writeln(level, "ASSO", "@%s@" % person.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "GodMother")
-                                else:
-                                    self._writeln(level, "ASSO", "@%s@" % person.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "Other")
-                                    if self.extended_role:
-                                        if role:
-                                            self._writeln(level+1, "NOTE", '\xA0%s' % EventRoleType._DATAMAP[rol][1])
-                                        else:
-                                            self._writeln(level+1, "NOTE", '\xA0%s' % str(ref.role))
-                                self._note_references(ref.get_note_list(), level+1)
-                            elif role in [EventRoleType.INFORMANT]:
-                                level = 2
-                                rol = role + 1
-                                self._writeln(level, "ASSO", "@%s@" % person.get_gramps_id())
-                                self._writeln(level+1, "TYPE", "INDI")
-                                self._writeln(level+1, "RELA", "Informant")
-                                self._note_references(ref.get_note_list(), level+1)
-                            elif role in [EventRoleType.WITNESS]:
-                                level = 2
-                                rol = role + 1
-                                self._writeln(level, "ASSO", "@%s@" % person.get_gramps_id())
-                                self._writeln(level+1, "TYPE", "INDI")
-                                self._writeln(level+1, "RELA", "Witness")
-                                self._note_references(ref.get_note_list(), level+1)
+            for person2 in self._witness_candidates(event.handle, None,
+                                                    ASSO_ROLES):
+                for ref in person2.get_event_ref_list():
+                    if ref.ref == event.handle:
+                        self._write_asso_for_ref(person2, ref)
 
     def _remaining_events(self, person):
         """
@@ -1209,7 +1277,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(1, 'EVEN', descr)
             else:
                 self._writeln(1, 'EVEN')
-            if val.strip() and not val == "ADOP":
+            if val.strip() and not val == "ADOP" :
                 self._writeln(2, 'TYPE', val)
             else:
                 self._writeln(2, 'TYPE', _(event.get_type().xml_str()))
@@ -1225,104 +1293,19 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         if self.include_witnesses:
             if etype in (EventType.BAPTISM, EventType.CHRISTEN):
-                for (objclass, handle) in self.dbase.find_backlink_handles(
-                    event.handle, ['Person']):
-                    if handle == person.handle:      # skip the owner before any fetch
-                        continue
-                    person2 = self.dbase.get_person_from_handle(handle)
-                    if person2:
-                        for ref in person2.get_event_ref_list():
-                            if ref.ref == event.handle:
-                                if int(ref.get_role()) == EventRoleType.CUSTOM:
-                                    level = 1
-                                    if str(ref.role) == "Mentionnée" or str(ref.role) == "Mentionné":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "Mentioned")
-                                    elif str(ref.role) == "Présence":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "Attending")
-                                    elif str(ref.role) == "Parrain":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "GodFather")
-                                    elif str(ref.role) == "Marraine":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "GodMother")
-                                    else:
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        if person2.get_gender() == Person.MALE:
-                                            self._writeln(level+1, "RELA", "Godfather")
-                                        elif person2.get_gender() == Person.FEMALE:
-                                            self._writeln(level+1, "RELA", "Godmother")
-                                        else:
-                                            self._writeln(level+1, "RELA", "Unknown")
-
-                                    self._note_references(ref.get_note_list(), level+1)
-                                else:
-                                    level = 2
-                                    self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "Witness")
-                                    self._note_references(ref.get_note_list(), level+1)
+                # any other person with any role is written (as before)
+                for person2 in self._witness_candidates(event.handle,
+                                                        person.handle):
+                    for ref in person2.get_event_ref_list():
+                        if ref.ref == event.handle:
+                            self._write_baptism_asso(person2, ref)
             else:
-                devel = 2
-                for (objclass, handle) in self.dbase.find_backlink_handles(
-                    event.handle, ['Person']):
-                    if handle == person.handle:      # skip the owner before any fetch
-                        continue
-                    person2 = self.dbase.get_person_from_handle(handle)
-                    if person2:
-                        for ref in person2.get_event_ref_list():
-                            if ref.ref == event.handle:
-                                role = int(ref.get_role())
-                                if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE, EventRoleType.FAMILY, EventRoleType.CUSTOM]:
-                                    level = 2
-#pylint: disable=maybe-no-member
-                                    rol = role + 1
-                                    if str(ref.role) == "Mentionnée" or str(ref.role) == "Mentionné":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "Mentioned")
-                                    elif str(ref.role) == "Présence":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "Attending")
-                                    elif str(ref.role) == "Parrain":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "GodFather")
-                                    elif str(ref.role) == "Marraine":
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "GodMother")
-                                    else:
-                                        self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                        self._writeln(level+1, "TYPE", "INDI")
-                                        self._writeln(level+1, "RELA", "Other")
-                                        if self.extended_role:
-                                            if role:
-                                                self._writeln(level+1, "NOTE", '\xA0%s' % EventRoleType._DATAMAP[rol][1])
-                                            else:
-                                                self._writeln(level+1, "NOTE", '\xA0%s' % str(ref.role))
-                                    self._note_references(ref.get_note_list(), level+1)
-                                elif role in [EventRoleType.INFORMANT]:
-                                    level = 2
-                                    rol = role + 1
-                                    self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "Informant")
-                                    self._note_references(ref.get_note_list(), level+1)
-                                elif role in [EventRoleType.WITNESS]:
-                                    level = 2
-                                    rol = role + 1
-                                    self._writeln(level, "ASSO", "@%s@" % person2.get_gramps_id())
-                                    self._writeln(level+1, "TYPE", "INDI")
-                                    self._writeln(level+1, "RELA", "Witness")
-                                    self._note_references(ref.get_note_list(), level+1)
+                for person2 in self._witness_candidates(event.handle,
+                                                        person.handle,
+                                                        ASSO_ROLES):
+                    for ref in person2.get_event_ref_list():
+                        if ref.ref == event.handle:
+                            self._write_asso_for_ref(person2, ref)
 
         if val == "TITL" and self.extendedtitle:
             descr = event.get_description()
