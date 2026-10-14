@@ -1224,8 +1224,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             if etype in (EventType.BAPTISM, EventType.CHRISTEN):
                 for (objclass, handle) in self.dbase.find_backlink_handles(
                     event.handle, ['Person']):
+                    if handle == person.handle:      # skip the owner before any fetch
+                        continue
                     person2 = self.dbase.get_person_from_handle(handle)
-                    if person2 and person2 != person:
+                    if person2:
                         for ref in person2.get_event_ref_list():
                             if ref.ref == event.handle:
                                 if int(ref.get_role()) == EventRoleType.CUSTOM:
@@ -1267,8 +1269,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 devel = 2
                 for (objclass, handle) in self.dbase.find_backlink_handles(
                     event.handle, ['Person']):
+                    if handle == person.handle:      # skip the owner before any fetch
+                        continue
                     person2 = self.dbase.get_person_from_handle(handle)
-                    if person2 and person != person2:
+                    if person2:
                         for ref in person2.get_event_ref_list():
                             if ref.ref == event.handle:
                                 role = int(ref.get_role())
