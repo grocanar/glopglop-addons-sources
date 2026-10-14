@@ -323,7 +323,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         """
         if place is None:
             return
-       
+
         if self.placegeneanet:
             displayer=PlaceDisplayGeneanet()
             dateobj2=Today()
@@ -335,7 +335,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         latitude = place.get_latitude()
         if longitude and latitude:
             (latitude, longitude) = conv_lat_lon(latitude, longitude, "GEDCOM")
-    
+
         if longitude and latitude:
             self._writeln(level + 1, "MAP")
             self._writeln(level + 2, 'LATI', latitude)
@@ -401,7 +401,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         self._person_name(person.get_primary_name(), nickname)
         if self.extprog:
             self.get_geneweb_name(person,person.get_primary_name())
-            
+
         for name in person.get_alternate_names():
             self._person_altname(name, "")
 
@@ -466,7 +466,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         if len(txt) > 0:
             data.append(txt)
         return data
- 
+
     def get_usuel_first_name(self,name):
         """
         Returns a GEDCOM-formatted usuel name.
@@ -489,7 +489,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             firstname = name.first_name.strip()
         return firstname
 
-    
+
     def _person_name(self, name, attr_nick):
         """
         n NAME <NAME_PERSONAL> {1:1}
@@ -549,7 +549,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         self._source_references(name.get_citation_list(), 2)
         self._note_references(name.get_note_list(), 2)
-    
+
     def _person_altname(self, name, attr_nick):
         """
         n NAME <NAME_PERSONAL> {1:1}
@@ -656,11 +656,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         urlparbase="https://gw.geneanet.org/glopglop?lang=fr&pz=eric+christophe&nz=doutreleau&p=eric+christophe&n=doutreleau&m=A&t=D&"
         if suffix == "":
             while NotTrouve:
-                genewebname = '%s %s.%d' % (surname, firstnam , num) 
-                nam = '%s %s' % (surname, firstnam ) 
+                genewebname = '%s %s.%d' % (surname, firstnam , num)
+                nam = '%s %s' % (surname, firstnam )
 
-          #      geneweburl = urlbase + '&p=%s&n=%s&oc=%d' % (firstnameurl , surnameurl ,num,name) 
-                geneweburl = '[[%s/%s/%s/Fiche de %s]]' %(firstnameurl , surnameurl ,num , nam) 
+          #      geneweburl = urlbase + '&p=%s&n=%s&oc=%d' % (firstnameurl , surnameurl ,num,name)
+                geneweburl = '[[%s/%s/%s/Fiche de %s]]' %(firstnameurl , surnameurl ,num , nam)
                 genewebparurl = urlparbase + 'p1=%s&n1=%s&oc1=%d' % (firstnameurl , surnameurl ,num) + "&l=20"
                 if self.GENEWEBNA[handle]:
                     return self.GENEWEBNA[handle]
@@ -679,8 +679,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             return genewebname
 
         while NotTrouve:
-            genewebname = '%s %s_%s.%d' % (surname, firstnam , suffix , num) 
-            geneweburl = urlbase + '&p=%s+%s&n=%s&oc=%d' % (firstnameurl , suffix , surnameurl ,num) 
+            genewebname = '%s %s_%s.%d' % (surname, firstnam , suffix , num)
+            geneweburl = urlbase + '&p=%s+%s&n=%s&oc=%d' % (firstnameurl , suffix , surnameurl ,num)
             genewebparurl = urlparbase + 'p1=%s+%s&n1=%s&oc1=%d' % (firstnameurl ,  suffix, surnameurl ,num) + "&l=20"
             if self.GENEWEBNA[handle]:
                 return self.GENEWEBNA[handle]
@@ -763,8 +763,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._note_references(photo_obj.get_note_list(), level+1)
                 if self.zip:
                     self._packzip(zippath)
- 
- 
+
+
     def _packzip(self, path ):
         if path and not path in self.zipfile.namelist():
             self.zipfile.write(path)
@@ -802,7 +802,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
               self._writeln(2, "PLAC unmarried")
         #ERO end proposition de gestion des différents types d'union - par exmple le PACS Français
 
-    
+
 # Workaround pour geneanet upload
 #    def _url_list(self, obj, level):
 #        if self.include_persurl:
@@ -816,7 +816,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 #        else:
 #            return
 
-    
+
 
     def _child_families(self, person):
         """
@@ -872,7 +872,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                 if src.get_publication_info():
                                     result = result + "<I>" + _("Publication Info") + "</I> " + src.get_publication_info() + "<BR>"
                                 if citation.get_page() != "":
-                                    result = result + "<I>" + _("Page") + "</I> : " + citation.get_page()[0:248] 
+                                    result = result + "<I>" + _("Page") + "</I> : " + citation.get_page()[0:248]
                                 result = result + "<BR>"
                                 self._writeln(1, 'NOTE %s' % result)
 
@@ -1017,7 +1017,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             text = htmlnotetext or note_text
         # return text of the note to its callers
         return text
-        
+
     def styled_note(self, styledtext, styled_format, contains_html=False):
         """
         @param: styledtext    --  assumed a StyledText object to write
@@ -1057,7 +1057,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             if linenb > 1:
                 OutText += "<br />"
         return OutText
-        
+
     def _note_record(self, note):
         """
         n @<XREF:NOTE>@ NOTE <SUBMITTER_TEXT> {1:1}
@@ -1075,10 +1075,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(0, "@%s@" % note.get_gramps_id(), "NOTE " + note.get())
 #ERO end - ajout pour conserver le formatage des notes dans l'export GEDCOM
 
- 
+
     def _person_event_ref(self, key, event_ref):
         """
-        Write the witnesses associated with the birth and death event. 
+        Write the witnesses associated with the birth and death event.
         based on http://www.geneanet.org/forum/index.php?topic=432352.0&lang=fr
         """
         if event_ref:
@@ -1102,7 +1102,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 if person:
                     for ref in person.get_event_ref_list():
                         devel = 2
-                        if (ref.ref == event.handle): 
+                        if (ref.ref == event.handle):
                             role = int(ref.get_role())
                             if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE ,EventRoleType.CLERGY, EventRoleType.AIDE,EventRoleType.FAMILY,EventRoleType.CUSTOM]:
                                 level = 2
@@ -1270,7 +1270,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     person2 = self.dbase.get_person_from_handle(handle)
                     if person2 and person != person2:
                         for ref in person2.get_event_ref_list():
-                            if (ref.ref == event.handle):  
+                            if (ref.ref == event.handle):
                                 role=int(ref.get_role())
                                 if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE, EventRoleType.FAMILY, EventRoleType.CUSTOM]:
                                     level = 2
@@ -1400,7 +1400,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     heads=1
                     self._writeln(2, 'NOTE' , '<TABLE border=1>' )
                     RANGSORT=dict(sorted(RANG.items(), key=lambda x:x[1]))
-                    for p in RANGSORT.keys():        
+                    for p in RANGSORT.keys():
                         msg="<TR>"
                         header="<TR>"
                         for typ in HEADS:
@@ -1433,7 +1433,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 elif attr_type == AttributeType.MOTHER_AGE:
                     self._writeln(2, 'WIFE')
                     self._writeln(3, 'AGE', attr.get_value())
-                else:  
+                else:
                     self._writeln(2, 'NOTE' )
                     typ = str(attr.get_type())
                     val = str(attr.get_value())
@@ -1447,12 +1447,12 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._photos(event.get_media_list(), 2)
             if place:
                 self._photos(place.get_media_list(), 2)
-    
+
 
     def _attributes(self, person):
         """
         Write out the attributes to the GEDCOM file.
-        
+
         Since we have already looked at nicknames when we generated the names,
         we filter them out here.
 
@@ -1463,7 +1463,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         if person.get_privacy():
             self._writeln(1, 'RESN confidential')
-            
+
         # filter out the nicknames
         attr_list = [attr for attr in person.get_attribute_list()
                      if attr.get_type() != AttributeType.NICKNAME]
@@ -1505,15 +1505,15 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._source_references(attr.get_citation_list(), 2)
 
     def _getgfgversion(self):
-        
+
         self.addons = get_all_addons()
         for plugin_dict in self.addons:
             pid = plugin_dict["i"]
             if pid == "Export GEDCOM for Geneanet":
                 result = str(plugin_dict["v"])
                 return result
-     
-        
+
+
     def _header(self, filename):
         """
         Write the GEDCOM header.
@@ -1573,7 +1573,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         self._writeln(2, "FORM", 'LINEAGE-LINKED')
         self._writeln(1, "CHAR", "UTF-8")
 
-        # write the language string if the current LANG variable 
+        # write the language string if the current LANG variable
         # matches something we know about.
 
         lang = glocale.language[0]
@@ -1605,7 +1605,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         conf = min(citation.get_confidence_level(),
                    Citation.CONF_VERY_HIGH)
-         
+
         if self.quaynote:
             if conf == Citation.CONF_VERY_HIGH:
                 self._writeln(level +1, "DATA")
@@ -1679,14 +1679,14 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                         url=link.group()
                         LOG.debug("deb write gedcom %s : %s  :" % ( str(url) , citattr.value ))
                         text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\" target=_blank rel=noreferrer>" + str(citattr.type) + "</A>"
-                        self._writeln(level + 1, "DATA" , text) 
+                        self._writeln(level + 1, "DATA" , text)
                     else:
                         self._writeln(level + 1, "DATA", str(citattr.type))
                         self._writeln(level + 2, "TEXT", citattr.value)
                 else:
                     self._writeln(level + 1, "DATA", str(citattr.type))
                     self._writeln(level + 2, "TEXT", citattr.value)
-                
+
     def write_gedcom_file(self, filename):
         """
         Write the actual GEDCOM file to the specified filename.
@@ -1699,7 +1699,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self.zipfile = zipfile.ZipFile(zipf,'w')
             if not self.zipfile:
                 raise Exception('fichier zip %s non ouvert' % zipf)
-        
+
         LOG.debug("deb write gedcom %d" % self.relativepath)
         if self.extprog:
             self.Extobj=Extobj()
@@ -1783,7 +1783,7 @@ class GedcomWriterOptionBox(WriterOptionBox):
         self.keepnoteformat = CONFIG.get("preferences.keepnoteformat")
         self.keepnoteformat_check = None
         #ERO end ajout param conservation formatage
-        
+
     def get_option_box(self):
         option_box = super(GedcomWriterOptionBox, self).get_option_box()
         # Make options:
@@ -1924,7 +1924,7 @@ class GedcomWriterOptionBox(WriterOptionBox):
         if self.keepnoteformat_check:
             self.keepnoteformat = self.keepnoteformat_check.get_active()
         #ERO end ajout param conservation formatage
-        
+
         CONFIG.set("preferences.include_witnesses" , self.include_witnesses )
         CONFIG.set("preferences.include_media" , self.include_media)
         CONFIG.set("preferences.include_depot" , self.include_depot)
