@@ -1097,8 +1097,6 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             if role != EventRoleType.PRIMARY:
                 return
             event = self.dbase.get_event_from_handle(event_ref.ref)
-            etype = int(event.get_type())
-            devel = 2
             for (objclass, handle) in self.dbase.find_backlink_handles(
                 event.handle, ['Person']):
                 person = self.dbase.get_person_from_handle(handle)
@@ -1189,7 +1187,6 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         role = int(event_ref.get_role())
         if role != EventRoleType.PRIMARY:
             return
-        devel = 2
         val = libgedcom.PERSONALCONSTANTEVENTS.get(etype, "").strip()
         if val and val.strip() and not val == "ADOP" :
             if val in NEEDS_PARAMETER:
@@ -1369,11 +1366,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             elif attr_type == _("WWW"):
                 self._writeln(2, 'WWW', attr.get_value())
             elif attr_type == AttributeType.TIME:
-                toto = 0
+                pass
             else:
                 self._writeln(2, 'NOTE', str(attr_type) + ": " + attr.get_value())
 
-        resultstring = ""
         etype = int(event.get_type())
         if etype == EventType.CENSUS:
             if self.inccensusplus:
@@ -1719,10 +1715,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         self.gedcom_file.close()
         if self.zip:
             self.zipfile.close()
+        ret2 = True
         if self.extprog:
             ret2 = self.Extobj.run(filename,self.database,self.GENEWEBURL)
 
-        return True
+        return ret2
 
 
 #-------------------------------------------------------------------------
