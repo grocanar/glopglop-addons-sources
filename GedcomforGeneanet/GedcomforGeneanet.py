@@ -1096,8 +1096,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self._dump_event_stats(event, event_ref, True)
 
         if self.include_witnesses:
-            role = int(event_ref.get_role())
-            if role != EventRoleType.PRIMARY:
+            if int(event_ref.get_role()) != EventRoleType.PRIMARY:
                 return
             # reuse `event` fetched above; no second get_event_from_handle
             for (objclass, handle) in self.dbase.find_backlink_handles(
