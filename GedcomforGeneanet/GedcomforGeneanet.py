@@ -50,7 +50,7 @@ from gramps.gui.plug.export import WriterOptionBox
 from gramps.gen.errors import DatabaseError
 from gramps.gen.lib.date import Today
 from gramps.gen.lib import (EventRoleType, FamilyRelType, Citation, EventType, \
- PlaceType,Person, AttributeType, NameType, NoteType, ChildRefType)
+ PlaceType, Person, AttributeType, NameType, NoteType, ChildRefType)
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.utils.file import media_path_full, media_path, relative_path
 try:
@@ -87,8 +87,8 @@ MIME2GED = {
     }
 
 LANGUAGES = {
-    'cs' : 'Czech', 'da' : 'Danish','nl' : 'Dutch',
-    'en' : 'English','eo' : 'Esperanto', 'fi' : 'Finnish',
+    'cs' : 'Czech', 'da' : 'Danish', 'nl' : 'Dutch',
+    'en' : 'English', 'eo' : 'Esperanto', 'fi' : 'Finnish',
     'fr' : 'French', 'de' : 'German', 'hu' : 'Hungarian',
     'it' : 'Italian', 'lt' : 'Latvian', 'lv' : 'Lithuanian',
     'no' : 'Norwegian', 'po' : 'Polish', 'pt' : 'Portuguese',
@@ -400,7 +400,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         self._person_name(person.get_primary_name(), nickname)
         if self.extprog:
-            self.get_geneweb_name(person,person.get_primary_name())
+            self.get_geneweb_name(person, person.get_primary_name())
 
         for name in person.get_alternate_names():
             self._person_altname(name, "")
@@ -442,7 +442,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         else:
             self.gedcom_file.write("%d %s\n" % (level, token))
 
-    def breakup(self,txt, limit):
+    def breakup(self, txt, limit):
         """
         Break a line of text into a list of strings that conform to the
         maximum length specified, while breaking words in the middle of a word
@@ -467,7 +467,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             data.append(txt)
         return data
 
-    def get_usuel_first_name(self,name):
+    def get_usuel_first_name(self, name):
         """
         Returns a GEDCOM-formatted usuel name.
         """
@@ -611,7 +611,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         self._note_references(name.get_note_list(), 2)
 
 
-    def get_genegedcom_name(self,name):
+    def get_genegedcom_name(self, name):
         """
         Returns a GEDCOM-formatted name.
         """
@@ -622,7 +622,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             return '%s %s' % (firstname, surname)
         return '%s %s %s' % (firstname, surname, suffix)
 
-    def get_gedcom_name(self,name):
+    def get_gedcom_name(self, name):
         """
         Returns a GEDCOM-formatted name.
         """
@@ -636,7 +636,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             return '%s /%s/' % (firstname, surname)
         return '%s /%s/ %s' % (firstname, surname, suffix)
 
-    def get_geneweb_name(self,person,name):
+    def get_geneweb_name(self, person, name):
         """
         Returns a GEDCOM-formatted name.
         """
@@ -660,8 +660,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 nam = '%s %s' % (surname, firstnam )
 
           #      geneweburl = urlbase + '&p=%s&n=%s&oc=%d' % (firstnameurl, surnameurl,num,name)
-                geneweburl = '[[%s/%s/%s/Fiche de %s]]' %(firstnameurl, surnameurl,num, nam)
-                genewebparurl = urlparbase + 'p1=%s&n1=%s&oc1=%d' % (firstnameurl, surnameurl,num) + "&l=20"
+                geneweburl = '[[%s/%s/%s/Fiche de %s]]' %(firstnameurl, surnameurl, num, nam)
+                genewebparurl = urlparbase + 'p1=%s&n1=%s&oc1=%d' % (firstnameurl, surnameurl, num) + "&l=20"
                 if self.GENEWEBNA[handle]:
                     return self.GENEWEBNA[handle]
                 handle=person.get_handle()
@@ -669,7 +669,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     num = num + 1
                 else:
                     LOG.debug(genewebname)
-                    LOG.debug(firstname," ",name . get_surname())
+                    LOG.debug(firstname, " ", name . get_surname())
                     NotTrouve = False
                     self.GENEWEBNAM[genewebname] = 1
                     self.GENEWEBURL[handle] = geneweburl
@@ -680,8 +680,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         while NotTrouve:
             genewebname = '%s %s_%s.%d' % (surname, firstnam, suffix, num)
-            geneweburl = urlbase + '&p=%s+%s&n=%s&oc=%d' % (firstnameurl, suffix, surnameurl,num)
-            genewebparurl = urlparbase + 'p1=%s+%s&n1=%s&oc1=%d' % (firstnameurl,  suffix, surnameurl,num) + "&l=20"
+            geneweburl = urlbase + '&p=%s+%s&n=%s&oc=%d' % (firstnameurl, suffix, surnameurl, num)
+            genewebparurl = urlparbase + 'p1=%s+%s&n1=%s&oc1=%d' % (firstnameurl,  suffix, surnameurl, num) + "&l=20"
             if self.GENEWEBNA[handle]:
                 return self.GENEWEBNA[handle]
             if self.GENEWEBNAM[genewebname]:
@@ -689,7 +689,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             else:
                 self.OCCU[handle] = num
                 LOG.debug(genewebname)
-                LOG.debug(firstname," ",name . get_surname())
+                LOG.debug(firstname, " ", name . get_surname())
                 self.GENEWEBNAM[genewebname] = 1
                 self.GENEWEBURL[handle] = geneweburl
                 self.GENEWEBPARURL[handle] = genewebparurl
@@ -699,9 +699,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 NotTrouve = False
         return genewebname
 
-    def rem_spaces(self,str):
-        str = re.sub(r'^"','_"',str)
-        str = re.sub(r'^\(','_(',str)
+    def rem_spaces(self, str):
+        str = re.sub(r'^"', '_"', str)
+        str = re.sub(r'^\(', '_(', str)
         char_remov = [ 'à', 'â', 'ä']
         for char in char_remov:
             str = str.replace(char, "a")
@@ -723,13 +723,13 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         char_remov = [ 'ç' ]
         for char in char_remov:
             str = str.replace(char, "c")
-        str = str.replace('-','_')
-        str = str.replace("'",'')
-        return str.replace(' ','_')
+        str = str.replace('-', '_')
+        str = str.replace("'", '')
+        return str.replace(' ', '_')
 
-    def plus_spaces(self,str):
-        str = str.replace(' ','+')
-        return str.replace('-','+')
+    def plus_spaces(self, str):
+        str = str.replace(' ', '+')
+        return str.replace('-', '+')
 
     def _photo(self, photo, level):
         """
@@ -748,7 +748,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     if not os.path.isfile(fullpath):
                         return
                     base = media_path(self.dbase)
-                    path = relative_path(fullpath,base)
+                    path = relative_path(fullpath, base)
                     zippath = fullpath
                 else:
                     path = media_path_full(self.dbase, photo_obj.get_path())
@@ -787,7 +787,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 event.set_type ("nomen")
                 MarrEventsCount+=1
             self._process_family_event(event, event_ref)
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref, True)
             level = 1
             #ERO - voir cette page pour explications https://fr.geneawiki.com/wiki/Import_Gedcom_-_gestion_des_couples_non_maries
             if int(family.get_relationship()) == FamilyRelType.UNMARRIED:
@@ -924,7 +924,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                         else:
                                             self._writeln(level+1, "NOTE", '\xA0%s' % str(ref.role))
                                 if self.extprog:
-                                    self.get_geneweb_name(person,person.get_primary_name())
+                                    self.get_geneweb_name(person, person.get_primary_name())
                                 self._note_references(ref.get_note_list(), level+1)
                             elif role in [EventRoleType.INFORMANT]:
                                 level = 2
@@ -933,7 +933,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                 self._writeln(level+1, "TYPE", "INDI")
                                 self._writeln(level+1, "RELA", "Informant")
                                 if self.extprog:
-                                    self.get_geneweb_name(person,person.get_primary_name())
+                                    self.get_geneweb_name(person, person.get_primary_name())
                                 self._note_references(ref.get_note_list(), level+1)
                             elif role in [EventRoleType.WITNESS]:
                                 level = 2
@@ -942,7 +942,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                 self._writeln(level+1, "TYPE", "INDI")
                                 self._writeln(level+1, "RELA", "Witness")
                                 if self.extprog:
-                                    self.get_geneweb_name(person,person.get_primary_name())
+                                    self.get_geneweb_name(person, person.get_primary_name())
                                 self._note_references(ref.get_note_list(), level+1)
 
 
@@ -980,13 +980,13 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     if link:
                         url=link.group()
                         text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\">" + str(srcattr.type) + "</A>"
-                        self._writeln(level + 1,"DATA", text)
+                        self._writeln(level + 1, "DATA", text)
                     else:
-                        self._writeln(level + 1,"DATA", str(srcattr.type))
-                        self._writeln(level + 2,"TEXT", srcattr.value)
+                        self._writeln(level + 1, "DATA", str(srcattr.type))
+                        self._writeln(level + 2, "TEXT", srcattr.value)
 
                 else:
-                    self._writeln(level + 1,"DATA", str(srcattr.type))
+                    self._writeln(level + 1, "DATA", str(srcattr.type))
                     self._writeln(level + 2, "TEXT", srcattr.value)
             self._photos(source.get_media_list(), 1)
 
@@ -1089,7 +1089,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(1, key, 'Y')
             if event.get_description().strip() != "":
                 self._writeln(2, 'TYPE', event.get_description())
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref, True)
 
         if self.include_witnesses and event_ref:
             role = int(event_ref.get_role())
@@ -1104,7 +1104,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                         devel = 2
                         if ref.ref == event.handle:
                             role = int(ref.get_role())
-                            if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE,EventRoleType.FAMILY,EventRoleType.CUSTOM]:
+                            if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE, EventRoleType.FAMILY, EventRoleType.CUSTOM]:
                                 level = 2
                                 rol = role + 1
                                 if str(ref.role) == "Mentionnée" or str(ref.role) == "Mentionné":
@@ -1213,9 +1213,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         etype = int(event.get_type())
         if etype == EventType.NOB_TITLE:
-            self._dump_event_stats(event, event_ref,False)
+            self._dump_event_stats(event, event_ref, False)
         else:
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref, True)
         if etype == EventType.ADOPT and not adop_written:
             adop_written = True
             self._adoption_records(person, adop_written)
@@ -1324,9 +1324,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             else:
                 self._writeln(1, 'EVEN')
             self._writeln(2, 'TYPE', 'Titre')
-            self._dump_event_stats(event, event_ref,True)
+            self._dump_event_stats(event, event_ref, True)
 
-    def _dump_event_stats(self, event, event_ref,addExtraInfos):
+    def _dump_event_stats(self, event, event_ref, addExtraInfos):
         """
         Write the event details for the event, using the event and event
         reference information.
@@ -1348,7 +1348,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         if event.get_place_handle():
             place = self.dbase.get_place_from_handle(event.get_place_handle())
-            self._place(place, dateobj, 2,addExtraInfos)
+            self._place(place, dateobj, 2, addExtraInfos)
 
         for attr in event.get_attribute_list():
             attr_type = attr.get_type()
@@ -1408,9 +1408,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                 header=header + "<TH>" + typ + "</TH>"
                             msg = msg + "<TD>" + RES[p][typ] + "</TD>"
                         if heads:
-                            self._writeln(3,'CONT', header, 255)
+                            self._writeln(3, 'CONT', header, 255)
                             heads=0
-                        self._writeln(3,'CONT', msg, 255)
+                        self._writeln(3, 'CONT', msg, 255)
                     self._writeln(3, 'CONT </TABLE>' )
             elif self.inccensus:
                 attrs = event_ref.get_attribute_list()
@@ -1421,7 +1421,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                         val = str(attr.get_value())
                         LOG.debug("INCCENSUS TYPE %s VAL %s" % ( typ, val))
                         text = typ + " : " + val
-                        self._writeln(3,'CONT', text, 255)
+                        self._writeln(3, 'CONT', text, 255)
         else:
             for attr in event_ref.get_attribute_list():
                 attr_type = attr.get_type()
@@ -1438,7 +1438,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     typ = str(attr.get_type())
                     val = str(attr.get_value())
                     text = typ + " : " + val
-                    self._writeln(3,'DATA', text )
+                    self._writeln(3, 'DATA', text )
         if addExtraInfos:
             self._note_references(event.get_note_list(), 2)
             self._note_references(event_ref.get_note_list(), 2)
@@ -1696,7 +1696,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         self.gedcom_file = io.open(filename, "w", encoding='utf-8')
         if self.zip:
             zipf = filename + ".zip"
-            self.zipfile = zipfile.ZipFile(zipf,'w')
+            self.zipfile = zipfile.ZipFile(zipf, 'w')
             if not self.zipfile:
                 raise Exception('fichier zip %s non ouvert' % zipf)
 
@@ -1716,7 +1716,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             self.zipfile.close()
         ret2 = True
         if self.extprog:
-            ret2 = self.Extobj.run(filename,self.database,self.GENEWEBURL)
+            ret2 = self.Extobj.run(filename, self.database, self.GENEWEBURL)
 
         return ret2
 
