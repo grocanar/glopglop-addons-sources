@@ -119,13 +119,13 @@ CONFIG = config.register_manager("gedcomforgeneanet")
 
 CONFIG.register("preferences.include_witnesses", True)
 CONFIG.register("preferences.include_media", False)
-CONFIG.register("preferences.include_depot" , True)
-CONFIG.register("preferences.extended_role" , False)
-CONFIG.register("preferences.relativepath" , True)
+CONFIG.register("preferences.include_depot", True)
+CONFIG.register("preferences.extended_role", False)
+CONFIG.register("preferences.relativepath", True)
 CONFIG.register("preferences.quaynote", True)
 CONFIG.register("preferences.zip", False)
-CONFIG.register("preferences.namegen" , True)
-CONFIG.register("preferences.nameus" , False)
+CONFIG.register("preferences.namegen", True)
+CONFIG.register("preferences.nameus", False)
 CONFIG.register("preferences.anychar", True)
 CONFIG.register("preferences.citattr", True)
 CONFIG.register("preferences.inccensus", True)
@@ -347,7 +347,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 place_name = _pd.display(self.dbase, place, dateobj)
                 text = _("Place name at the time") + " : "  + place_name
                 #ERO begin correction du level pour afficher les notes de lieu au bon niveau
-                self._writeln(level, 'NOTE' , text )
+                self._writeln(level, 'NOTE', text )
                 #ERO end correction du level pour afficher les notes de lieu au bon niveau
         if self.altname and addExtraInfos:
             alt_names=self.display_alt_names(place)
@@ -356,7 +356,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 text = _("Alternate name for place") + " : " + '\n'.join(alt_names)
                 #ERO end
                 #ERO begin correction du level pour afficher les notes de lieu au bon niveau
-                self._writeln(level, 'NOTE' , text )
+                self._writeln(level, 'NOTE', text )
                 #ERO end correction du level pour afficher les notes de lieu au bon niveau
         else:
             LOG.debug(" PAS PLACENOTE")
@@ -365,7 +365,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             notelist = place.get_note_list()
             if notelist:
                 text = _("Notes sur ce lieu") + " : "
-                self._writeln(level, 'NOTE' , text )
+                self._writeln(level, 'NOTE', text )
                 self._note_references(notelist, level)
         #ERO end correction ne pas ajouter les notes pour les NOB_TITLE
 
@@ -656,12 +656,12 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         urlparbase="https://gw.geneanet.org/glopglop?lang=fr&pz=eric+christophe&nz=doutreleau&p=eric+christophe&n=doutreleau&m=A&t=D&"
         if suffix == "":
             while NotTrouve:
-                genewebname = '%s %s.%d' % (surname, firstnam , num)
+                genewebname = '%s %s.%d' % (surname, firstnam, num)
                 nam = '%s %s' % (surname, firstnam )
 
-          #      geneweburl = urlbase + '&p=%s&n=%s&oc=%d' % (firstnameurl , surnameurl ,num,name)
-                geneweburl = '[[%s/%s/%s/Fiche de %s]]' %(firstnameurl , surnameurl ,num , nam)
-                genewebparurl = urlparbase + 'p1=%s&n1=%s&oc1=%d' % (firstnameurl , surnameurl ,num) + "&l=20"
+          #      geneweburl = urlbase + '&p=%s&n=%s&oc=%d' % (firstnameurl, surnameurl,num,name)
+                geneweburl = '[[%s/%s/%s/Fiche de %s]]' %(firstnameurl, surnameurl,num, nam)
+                genewebparurl = urlparbase + 'p1=%s&n1=%s&oc1=%d' % (firstnameurl, surnameurl,num) + "&l=20"
                 if self.GENEWEBNA[handle]:
                     return self.GENEWEBNA[handle]
                 handle=person.get_handle()
@@ -679,9 +679,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             return genewebname
 
         while NotTrouve:
-            genewebname = '%s %s_%s.%d' % (surname, firstnam , suffix , num)
-            geneweburl = urlbase + '&p=%s+%s&n=%s&oc=%d' % (firstnameurl , suffix , surnameurl ,num)
-            genewebparurl = urlparbase + 'p1=%s+%s&n1=%s&oc1=%d' % (firstnameurl ,  suffix, surnameurl ,num) + "&l=20"
+            genewebname = '%s %s_%s.%d' % (surname, firstnam, suffix, num)
+            geneweburl = urlbase + '&p=%s+%s&n=%s&oc=%d' % (firstnameurl, suffix, surnameurl,num)
+            genewebparurl = urlparbase + 'p1=%s+%s&n1=%s&oc1=%d' % (firstnameurl,  suffix, surnameurl,num) + "&l=20"
             if self.GENEWEBNA[handle]:
                 return self.GENEWEBNA[handle]
             if self.GENEWEBNAM[genewebname]:
@@ -702,19 +702,19 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
     def rem_spaces(self,str):
         str = re.sub(r'^"','_"',str)
         str = re.sub(r'^\(','_(',str)
-        char_remov = [ 'à', 'â' , 'ä']
+        char_remov = [ 'à', 'â', 'ä']
         for char in char_remov:
             str = str.replace(char, "a")
-        char_remov = [ 'é' , 'è' , 'ê' , 'ë' ]
+        char_remov = [ 'é', 'è', 'ê', 'ë' ]
         for char in char_remov:
             str = str.replace(char, "e")
-        char_remov = [ 'î' , 'ï' ]
+        char_remov = [ 'î', 'ï' ]
         for char in char_remov:
             str = str.replace(char, "i")
-        char_remov = [ 'ô' , 'ö' ]
+        char_remov = [ 'ô', 'ö' ]
         for char in char_remov:
             str = str.replace(char, "o")
-        char_remov = [ 'ù' , 'û' , 'ü' ]
+        char_remov = [ 'ù', 'û', 'ü' ]
         for char in char_remov:
             str = str.replace(char, "u")
         char_remov = [ 'ÿ' ]
@@ -980,7 +980,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     if link:
                         url=link.group()
                         text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\">" + str(srcattr.type) + "</A>"
-                        self._writeln(level + 1,"DATA" , text)
+                        self._writeln(level + 1,"DATA", text)
                     else:
                         self._writeln(level + 1,"DATA", str(srcattr.type))
                         self._writeln(level + 2,"TEXT", srcattr.value)
@@ -1104,7 +1104,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                         devel = 2
                         if ref.ref == event.handle:
                             role = int(ref.get_role())
-                            if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE ,EventRoleType.CLERGY, EventRoleType.AIDE,EventRoleType.FAMILY,EventRoleType.CUSTOM]:
+                            if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE,EventRoleType.FAMILY,EventRoleType.CUSTOM]:
                                 level = 2
                                 rol = role + 1
                                 if str(ref.role) == "Mentionnée" or str(ref.role) == "Mentionné":
@@ -1174,7 +1174,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         if not adop_written:
             self._adoption_records(person, adop_written)
 
-    def _process_person_event(self, person ,event ,event_ref):
+    def _process_person_event(self, person, event, event_ref):
         """
         Write the witnesses associated with other personnal event.
         """
@@ -1395,10 +1395,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                         if typ == 'Rang':
                                             RANG[hdl]=int(val)
                                         RES[hdl][typ]=val
-                                        LOG.debug("PLUS TYPE %s VAL %s" % ( typ , val))
+                                        LOG.debug("PLUS TYPE %s VAL %s" % ( typ, val))
                 if len(RES.keys()):
                     heads=1
-                    self._writeln(2, 'NOTE' , '<TABLE border=1>' )
+                    self._writeln(2, 'NOTE', '<TABLE border=1>' )
                     RANGSORT=dict(sorted(RANG.items(), key=lambda x:x[1]))
                     for p in RANGSORT.keys():
                         msg="<TR>"
@@ -1408,9 +1408,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                 header=header + "<TH>" + typ + "</TH>"
                             msg = msg + "<TD>" + RES[p][typ] + "</TD>"
                         if heads:
-                            self._writeln(3,'CONT', header , 255)
+                            self._writeln(3,'CONT', header, 255)
                             heads=0
-                        self._writeln(3,'CONT', msg , 255)
+                        self._writeln(3,'CONT', msg, 255)
                     self._writeln(3, 'CONT </TABLE>' )
             elif self.inccensus:
                 attrs = event_ref.get_attribute_list()
@@ -1419,9 +1419,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     for attr in attrs:
                         typ = str(attr.get_type())
                         val = str(attr.get_value())
-                        LOG.debug("INCCENSUS TYPE %s VAL %s" % ( typ , val))
+                        LOG.debug("INCCENSUS TYPE %s VAL %s" % ( typ, val))
                         text = typ + " : " + val
-                        self._writeln(3,'CONT', text , 255)
+                        self._writeln(3,'CONT', text, 255)
         else:
             for attr in event_ref.get_attribute_list():
                 attr_type = attr.get_type()
@@ -1677,9 +1677,9 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     link = re.match(url_pattern, citattr.value)
                     if link:
                         url=link.group()
-                        LOG.debug("deb write gedcom %s : %s  :" % ( str(url) , citattr.value ))
+                        LOG.debug("deb write gedcom %s : %s  :" % ( str(url), citattr.value ))
                         text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\" target=_blank rel=noreferrer>" + str(citattr.type) + "</A>"
-                        self._writeln(level + 1, "DATA" , text)
+                        self._writeln(level + 1, "DATA", text)
                     else:
                         self._writeln(level + 1, "DATA", str(citattr.type))
                         self._writeln(level + 2, "TEXT", citattr.value)
@@ -1732,7 +1732,7 @@ class GedcomWriterOptionBox(WriterOptionBox):
     Create a VBox with the option widgets and define methods to retrieve
     the options.
     """
-    def __init__(self, person, dbstate, uistate , track=None, window=None):
+    def __init__(self, person, dbstate, uistate, track=None, window=None):
         """
         Initialize the local options.
         """
@@ -1925,29 +1925,29 @@ class GedcomWriterOptionBox(WriterOptionBox):
             self.keepnoteformat = self.keepnoteformat_check.get_active()
         #ERO end ajout param conservation formatage
 
-        CONFIG.set("preferences.include_witnesses" , self.include_witnesses )
-        CONFIG.set("preferences.include_media" , self.include_media)
-        CONFIG.set("preferences.include_depot" , self.include_depot)
-        CONFIG.set("preferences.extended_role" , self.extended_role)
-        CONFIG.set("preferences.relativepath" , self.relativepath)
-        CONFIG.set("preferences.quaynote" , self.quaynote)
-        CONFIG.set("preferences.zip" , self.zip)
-        CONFIG.set("preferences.namegen" , self.namegen)
-        CONFIG.set("preferences.nameus" , self.nameus)
-        CONFIG.set("preferences.anychar" , self.anychar)
-        CONFIG.set("preferences.citattr" , self.citattr)
-        CONFIG.set("preferences.inccensus" , self.inccensus)
-        CONFIG.set("preferences.inccensusplus" , self.inccensusplus)
-        CONFIG.set("preferences.urlshort" , self.urlshort)
-        CONFIG.set("preferences.parentsrc" , self.parentsrc)
-        CONFIG.set("preferences.extprog" , self.extprog)
-        CONFIG.set("preferences.altname" , self.altname)
-        CONFIG.set("preferences.placegeneanet" , self.placegeneanet)
-        CONFIG.set("preferences.ancplacename" , self.ancplacename)
-        CONFIG.set("preferences.extendedtitle" , self.extendedtitle)
-        CONFIG.set("preferences.grouptitle" , self.grouptitle)
+        CONFIG.set("preferences.include_witnesses", self.include_witnesses )
+        CONFIG.set("preferences.include_media", self.include_media)
+        CONFIG.set("preferences.include_depot", self.include_depot)
+        CONFIG.set("preferences.extended_role", self.extended_role)
+        CONFIG.set("preferences.relativepath", self.relativepath)
+        CONFIG.set("preferences.quaynote", self.quaynote)
+        CONFIG.set("preferences.zip", self.zip)
+        CONFIG.set("preferences.namegen", self.namegen)
+        CONFIG.set("preferences.nameus", self.nameus)
+        CONFIG.set("preferences.anychar", self.anychar)
+        CONFIG.set("preferences.citattr", self.citattr)
+        CONFIG.set("preferences.inccensus", self.inccensus)
+        CONFIG.set("preferences.inccensusplus", self.inccensusplus)
+        CONFIG.set("preferences.urlshort", self.urlshort)
+        CONFIG.set("preferences.parentsrc", self.parentsrc)
+        CONFIG.set("preferences.extprog", self.extprog)
+        CONFIG.set("preferences.altname", self.altname)
+        CONFIG.set("preferences.placegeneanet", self.placegeneanet)
+        CONFIG.set("preferences.ancplacename", self.ancplacename)
+        CONFIG.set("preferences.extendedtitle", self.extendedtitle)
+        CONFIG.set("preferences.grouptitle", self.grouptitle)
         #ERO begin ajout param conservation formatage
-        CONFIG.set("preferences.keepnoteformat" , self.keepnoteformat)
+        CONFIG.set("preferences.keepnoteformat", self.keepnoteformat)
         #ERO end ajout param conservation formatage
         CONFIG.save()
 
