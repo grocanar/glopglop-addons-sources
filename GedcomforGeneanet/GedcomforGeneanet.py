@@ -66,9 +66,9 @@ from GeneanetUtils import PlaceDisplayGeneanet
 try:
     from ExtProg import Extobj
 except ImportError:
-    IsAbleExtprog=False
+    IsAbleExtprog = False
 else:
-    IsAbleExtprog=True
+    IsAbleExtprog = True
 from gramps.gen.plug.utils import get_all_addons
 #ERO begin - ajout pour conserver le formatage des notes dans l'export GEDCOM
 from gramps.plugins.lib.libhtmlbackend import HtmlBackend, process_spaces
@@ -252,7 +252,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         #ERO end - ajout pour conserver le formattage des notes dans l'export GEDCOM
         print("EXTPROG avant try %s" % str(self.extprog))
         if not IsAbleExtprog:
-            self.extprog=0
+            self.extprog = 0
         if self.extprog:
             self.GENEWEBNAM = defaultdict(str)
             self.GENEWEBNA = defaultdict(str)
@@ -325,8 +325,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             return
 
         if self.placegeneanet:
-            displayer=PlaceDisplayGeneanet()
-            dateobj2=Today()
+            displayer = PlaceDisplayGeneanet()
+            dateobj2 = Today()
             place_name = displayer.display(self.dbase, place, dateobj2)
         else:
             place_name = _pd.display(self.dbase, place, dateobj)
@@ -350,7 +350,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self._writeln(level, 'NOTE', text )
                 #ERO end correction du level pour afficher les notes de lieu au bon niveau
         if self.altname and addExtraInfos:
-            alt_names=self.display_alt_names(place)
+            alt_names = self.display_alt_names(place)
             if len(alt_names) > 0:
                 #ERO begin
                 text = _("Alternate name for place") + " : " + '\n'.join(alt_names)
@@ -652,19 +652,19 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         surnameurl = self.plus_spaces(name . get_surname())
         suffix = name.get_suffix()
         handle = person.get_handle()
-        urlbase="https://gw.geneanet.org/glopglop?lang=fr"
-        urlparbase="https://gw.geneanet.org/glopglop?lang=fr&pz=eric+christophe&nz=doutreleau&p=eric+christophe&n=doutreleau&m=A&t=D&"
+        urlbase = "https://gw.geneanet.org/glopglop?lang=fr"
+        urlparbase = "https://gw.geneanet.org/glopglop?lang=fr&pz=eric+christophe&nz=doutreleau&p=eric+christophe&n=doutreleau&m=A&t=D&"
         if suffix == "":
             while NotTrouve:
                 genewebname = '%s %s.%d' % (surname, firstnam, num)
                 nam = '%s %s' % (surname, firstnam )
 
           #      geneweburl = urlbase + '&p=%s&n=%s&oc=%d' % (firstnameurl, surnameurl,num,name)
-                geneweburl = '[[%s/%s/%s/Fiche de %s]]' %(firstnameurl, surnameurl, num, nam)
+                geneweburl = '[[%s/%s/%s/Fiche de %s]]' % (firstnameurl, surnameurl, num, nam)
                 genewebparurl = urlparbase + 'p1=%s&n1=%s&oc1=%d' % (firstnameurl, surnameurl, num) + "&l=20"
                 if self.GENEWEBNA[handle]:
                     return self.GENEWEBNA[handle]
-                handle=person.get_handle()
+                handle = person.get_handle()
                 if self.GENEWEBNAM[genewebname]:
                     num = num + 1
                 else:
@@ -674,7 +674,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     self.GENEWEBNAM[genewebname] = 1
                     self.GENEWEBURL[handle] = geneweburl
                     self.GENEWEBPARURL[handle] = genewebparurl
-                    self.GENEWEBNA[handle]=genewebname
+                    self.GENEWEBNA[handle] = genewebname
                     self.OCCU[handle] = num
             return genewebname
 
@@ -693,8 +693,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 self.GENEWEBNAM[genewebname] = 1
                 self.GENEWEBURL[handle] = geneweburl
                 self.GENEWEBPARURL[handle] = genewebparurl
-                handle=person.get_handle()
-                self.GENEWEBNA[handle]=genewebname
+                handle = person.get_handle()
+                self.GENEWEBNA[handle] = genewebname
                 self.OCCU[handle] = num
                 NotTrouve = False
         return genewebname
@@ -779,13 +779,13 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 continue
             if ((int(family.get_relationship()) == FamilyRelType.CIVIL_UNION) and int(event.get_type()) == EventType.MARR_ALT):
                 event.set_type ("pacs")
-                MarrEventsCount+=1
+                MarrEventsCount += 1
             elif ((int(family.get_relationship()) == FamilyRelType.UNMARRIED) and int(event.get_type()) == EventType.MARR_ALT):
                 event.set_type (EventType.MARRIAGE)
-                MarrEventsCount+=1
+                MarrEventsCount += 1
             elif ((int(family.get_relationship()) == FamilyRelType.UNKNOWN) and int(event.get_type()) == EventType.MARR_ALT):
                 event.set_type ("nomen")
-                MarrEventsCount+=1
+                MarrEventsCount += 1
             self._process_family_event(event, event_ref)
             self._dump_event_stats(event, event_ref, True)
             level = 1
@@ -893,7 +893,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 if person:
                     for ref in person.get_event_ref_list():
                         if ref.ref == event.handle:
-                            role=int(ref.get_role())
+                            role = int(ref.get_role())
                             if role in [EventRoleType.CELEBRANT,  EventRoleType.CLERGY, EventRoleType.AIDE, EventRoleType.FAMILY, EventRoleType.CUSTOM]:
                                 level = 2
 
@@ -978,7 +978,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
                     link = re.match(url_pattern, srcattr.value)
                     if link:
-                        url=link.group()
+                        url = link.group()
                         text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\">" + str(srcattr.type) + "</A>"
                         self._writeln(level + 1, "DATA", text)
                     else:
@@ -1029,7 +1029,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         if not text:
             return ""
         s_tags = styledtext.get_tags()
-        OutText=""
+        OutText = ""
         if contains_html:
             markuptext = self._backend.add_markup_from_styled(
                 text, s_tags, split="\n", escape=False
@@ -1271,7 +1271,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     if person2 and person != person2:
                         for ref in person2.get_event_ref_list():
                             if ref.ref == event.handle:
-                                role=int(ref.get_role())
+                                role = int(ref.get_role())
                                 if int(ref.get_role()) in [EventRoleType.CELEBRANT, EventRoleType.AIDE, EventRoleType.CLERGY, EventRoleType.AIDE, EventRoleType.FAMILY, EventRoleType.CUSTOM]:
                                     level = 2
 #pylint: disable=maybe-no-member
@@ -1372,10 +1372,10 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         etype = int(event.get_type())
         if etype == EventType.CENSUS:
             if self.inccensusplus:
-                RES= defaultdict(lambda : defaultdict(str))
+                RES = defaultdict(lambda : defaultdict(str))
                 LOG.debug("INCCENSUSPLUS EVENT")
-                HEADS=[]
-                RANG=defaultdict(int)
+                HEADS = []
+                RANG = defaultdict(int)
                 for (objclass, hdl) in self.database.find_backlink_handles(
                     event.handle, ['Person']):
                     person2 = self.database.get_person_from_handle(hdl)
@@ -1393,8 +1393,8 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                             HEADS.append(typ)
                                         val = str(attr.get_value())
                                         if typ == 'Rang':
-                                            RANG[hdl]=int(val)
-                                        RES[hdl][typ]=val
+                                            RANG[hdl] = int(val)
+                                        RES[hdl][typ] = val
                                         LOG.debug("PLUS TYPE %s VAL %s" % ( typ, val))
                 if len(RES.keys()):
                     heads = 1
@@ -1405,11 +1405,11 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                         header = "<TR>"
                         for typ in HEADS:
                             if heads:
-                                header=header + "<TH>" + typ + "</TH>"
+                                header = header + "<TH>" + typ + "</TH>"
                             msg = msg + "<TD>" + RES[p][typ] + "</TD>"
                         if heads:
                             self._writeln(3, 'CONT', header, 255)
-                            heads=0
+                            heads = 0
                         self._writeln(3, 'CONT', msg, 255)
                     self._writeln(3, 'CONT </TABLE>' )
             elif self.inccensus:
@@ -1608,20 +1608,20 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         if self.quaynote:
             if conf == Citation.CONF_VERY_HIGH:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Very High Quality Source"))
+                self._writeln(level + 1, "DATA")
+                self._writeln(level + 2, "NOTE", _("Very High Quality Source"))
             elif conf == Citation.CONF_HIGH:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("High Quality Source"))
+                self._writeln(level + 1, "DATA")
+                self._writeln(level + 2, "NOTE", _("High Quality Source"))
             elif conf == Citation.CONF_NORMAL:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Normal Quality Source"))
+                self._writeln(level + 1, "DATA")
+                self._writeln(level + 2, "NOTE", _("Normal Quality Source"))
             elif conf == Citation.CONF_LOW:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Low Quality Source"))
+                self._writeln(level + 1, "DATA")
+                self._writeln(level + 2, "NOTE", _("Low Quality Source"))
             elif conf == Citation.CONF_VERY_LOW:
-                self._writeln(level +1, "DATA")
-                self._writeln(level +2, "NOTE", _("Very Low Quality Source"))
+                self._writeln(level + 1, "DATA")
+                self._writeln(level + 2, "NOTE", _("Very Low Quality Source"))
         if  conf != -1:
             self._writeln(level + 1, "QUAY", QUALITY_MAP[conf])
 
@@ -1676,7 +1676,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
                     link = re.match(url_pattern, citattr.value)
                     if link:
-                        url=link.group()
+                        url = link.group()
                         LOG.debug("deb write gedcom %s : %s  :" % ( str(url), citattr.value ))
                         text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\" target=_blank rel=noreferrer>" + str(citattr.type) + "</A>"
                         self._writeln(level + 1, "DATA", text)
@@ -1702,7 +1702,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
 
         LOG.debug("deb write gedcom %d" % self.relativepath)
         if self.extprog:
-            self.Extobj=Extobj()
+            self.Extobj = Extobj()
         self._header(filename)
         self._submitter()
         self._individuals()
