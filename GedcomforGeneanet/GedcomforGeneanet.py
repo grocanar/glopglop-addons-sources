@@ -61,7 +61,6 @@ _ = _trans.gettext
 from gramps.version import VERSION
 from gramps.gen.config import config
 from gramps.gen.display.place import displayer as _pd
-from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
 from GeneanetUtils import PlaceDisplayGeneanet
 try:
