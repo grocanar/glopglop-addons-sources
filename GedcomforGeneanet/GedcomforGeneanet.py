@@ -1622,7 +1622,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
             elif conf == Citation.CONF_VERY_LOW:
                 self._writeln(level + 1, "DATA")
                 self._writeln(level + 2, "NOTE", _("Very Low Quality Source"))
-        if  conf != -1:
+        if conf != -1:
             self._writeln(level + 1, "QUAY", QUALITY_MAP[conf])
 
         if not citation.get_date_object().is_empty():
