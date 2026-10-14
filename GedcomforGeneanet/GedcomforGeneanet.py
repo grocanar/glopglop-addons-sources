@@ -702,25 +702,25 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
     def rem_spaces(self, str):
         str = re.sub(r'^"', '_"', str)
         str = re.sub(r'^\(', '_(', str)
-        char_remov = [ 'à', 'â', 'ä']
+        char_remov = ['à', 'â', 'ä']
         for char in char_remov:
             str = str.replace(char, "a")
-        char_remov = [ 'é', 'è', 'ê', 'ë']
+        char_remov = ['é', 'è', 'ê', 'ë']
         for char in char_remov:
             str = str.replace(char, "e")
-        char_remov = [ 'î', 'ï']
+        char_remov = ['î', 'ï']
         for char in char_remov:
             str = str.replace(char, "i")
-        char_remov = [ 'ô', 'ö']
+        char_remov = ['ô', 'ö']
         for char in char_remov:
             str = str.replace(char, "o")
-        char_remov = [ 'ù', 'û', 'ü']
+        char_remov = ['ù', 'û', 'ü']
         for char in char_remov:
             str = str.replace(char, "u")
-        char_remov = [ 'ÿ']
+        char_remov = ['ÿ']
         for char in char_remov:
             str = str.replace(char, "y")
-        char_remov = [ 'ç']
+        char_remov = ['ç']
         for char in char_remov:
             str = str.replace(char, "c")
         str = str.replace('-', '_')
