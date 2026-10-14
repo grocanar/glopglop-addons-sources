@@ -1395,7 +1395,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                                         if typ == 'Rang':
                                             RANG[hdl] = int(val)
                                         RES[hdl][typ] = val
-                                        LOG.debug("PLUS TYPE %s VAL %s" % ( typ, val))
+                                        LOG.debug("PLUS TYPE %s VAL %s" % (typ, val))
                 if len(RES.keys()):
                     heads = 1
                     self._writeln(2, 'NOTE', '<TABLE border=1>')
@@ -1419,7 +1419,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     for attr in attrs:
                         typ = str(attr.get_type())
                         val = str(attr.get_value())
-                        LOG.debug("INCCENSUS TYPE %s VAL %s" % ( typ, val))
+                        LOG.debug("INCCENSUS TYPE %s VAL %s" % (typ, val))
                         text = typ + " : " + val
                         self._writeln(3, 'CONT', text, 255)
         else:
@@ -1677,7 +1677,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                     link = re.match(url_pattern, citattr.value)
                     if link:
                         url = link.group()
-                        LOG.debug("deb write gedcom %s : %s  :" % ( str(url), citattr.value))
+                        LOG.debug("deb write gedcom %s : %s  :" % (str(url), citattr.value))
                         text = "<A HREF=\"" + str(url) + "\" title=\"" + str(url) + "\" target=_blank rel=noreferrer>" + str(citattr.type) + "</A>"
                         self._writeln(level + 1, "DATA", text)
                     else:
