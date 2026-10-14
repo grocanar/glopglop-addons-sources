@@ -1191,7 +1191,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         if role != EventRoleType.PRIMARY:
             return
         val = libgedcom.PERSONALCONSTANTEVENTS.get(etype, "").strip()
-        if val and val.strip() and not val == "ADOP" :
+        if val and val.strip() and not val == "ADOP":
             if val in NEEDS_PARAMETER:
                 if event.get_description().strip():
                     self._writeln(1, val, event.get_description())
@@ -1380,7 +1380,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         etype = int(event.get_type())
         if etype == EventType.CENSUS:
             if self.inccensusplus:
-                RES = defaultdict(lambda : defaultdict(str))
+                RES = defaultdict(lambda: defaultdict(str))
                 LOG.debug("INCCENSUSPLUS EVENT")
                 HEADS = []
                 RANG = defaultdict(int)
@@ -1407,7 +1407,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
                 if len(RES.keys()):
                     heads = 1
                     self._writeln(2, 'NOTE', '<TABLE border=1>')
-                    RANGSORT = dict(sorted(RANG.items(), key=lambda x : x[1]))
+                    RANGSORT = dict(sorted(RANG.items(), key=lambda x: x[1]))
                     for p in RANGSORT.keys():
                         msg = "<TR>"
                         header = "<TR>"
