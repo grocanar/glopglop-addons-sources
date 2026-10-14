@@ -200,6 +200,26 @@ def event_has_subordinate_data(event, event_ref):
         return False
 
 
+class PlaceCachingDb(object):
+    """Read-through cache for places during the export."""
+
+    def __init__(self, db):
+        self._db = db
+        self._places = {}
+
+    def get_place_from_handle(self, handle):
+        try:
+            return self._places[handle]
+        except KeyError:
+            place = self._db.get_place_from_handle(handle)
+            self._places[handle] = place
+            return place
+
+    def __getattr__(self, name):
+        # only called for attributes not found on this object
+        return getattr(self._db, name)
+
+
 class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
     """
     GedcomWriter forGeneanets.
@@ -1682,6 +1702,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
         Write the actual GEDCOM file to the specified filename.
         """
 
+        self.dbase = PlaceCachingDb(self.dbase)
         self.dirname = os.path.dirname (filename)
         self.gedcom_file = io.open(filename, "w", encoding='utf-8')
         if self.zip:
