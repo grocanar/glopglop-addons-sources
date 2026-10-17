@@ -46,6 +46,6 @@ register(EXPORT,
     export_function = 'export_data',
     export_options = 'GedcomWriterOptionBox',
     export_options_title = _('GEDCOM for Geneanet options'),
-    extension = "ged",
+    extension = "gene.ged",
 )
 
