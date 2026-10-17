@@ -1517,6 +1517,7 @@ class GedcomWriterforGeneanet(exportgedcom.GedcomWriter):
     def _getgfgversion(self):
 
         self.addons = get_all_addons()
+        result=""
         for plugin_dict in self.addons:
             pid = plugin_dict["i"]
             if pid == "Export GEDCOM for Geneanet":
