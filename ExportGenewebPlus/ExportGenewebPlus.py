@@ -262,7 +262,7 @@ class GeneWebPlusWriter:
             with open(self.filename, "w", encoding="utf-8",
                       newline="\n") as self.g:
                 self.prepare()
-                families = sorted(self.db.iter_families(),
+                families = sorted(self.families.values(),
                                   key=lambda f: f.get_gramps_id())
                 isolated = [p for p in self.persons if self.is_isolated(p)]
 
@@ -291,8 +291,13 @@ class GeneWebPlusWriter:
     def prepare(self):
         """Compute names, occurrence numbers, main parent families,
         witnesses and relations before writing anything."""
+        # Each person and family is read only once: through the living
+        # people filter (LivingProxyDb), every read computes again whether
+        # the person is alive, which is very slow on a large tree.
         self.persons = sorted(self.db.iter_people(),
                               key=lambda p: p.get_gramps_id())
+        self.people = {p.get_handle(): p for p in self.persons}
+        self.families = {f.get_handle(): f for f in self.db.iter_families()}
         used = {}
         for person in self.persons:
             handle = person.get_handle()
@@ -308,7 +313,7 @@ class GeneWebPlusWriter:
             used[key] = self.occ[handle] + 1
 
             for fam_handle in person.get_parent_family_handle_list():
-                if self.db.get_family_from_handle(fam_handle):
+                if fam_handle in self.families:
                     self.main_family[handle] = fam_handle
                     break
 
@@ -328,7 +333,7 @@ class GeneWebPlusWriter:
 
         # Children also linked to a family which is not their main one
         # (GeneWeb allows only one): exported as relations.
-        for family in self.db.iter_families():
+        for family in self.families.values():
             fam_handle = family.get_handle()
             father = self.get_person(family.get_father_handle())
             mother = self.get_person(family.get_mother_handle())
@@ -353,14 +358,12 @@ class GeneWebPlusWriter:
                     LOG.warning("%s is a child of several families, "
                                 "only kept in %s",
                                 child.get_gramps_id(),
-                                self.db.get_family_from_handle(
+                                self.families[
                                     self.main_family[child_ref.ref]
-                                ).get_gramps_id())
+                                ].get_gramps_id())
 
     def get_person(self, handle):
-        if not handle:
-            return None
-        return self.db.get_person_from_handle(handle)
+        return self.people.get(handle)
 
     def is_bogus(self, person):
         surname, firstname = self.names[person.get_handle()]
@@ -370,7 +373,7 @@ class GeneWebPlusWriter:
         if person.get_handle() in self.main_family:
             return False
         for fam_handle in person.get_family_handle_list():
-            if self.db.get_family_from_handle(fam_handle):
+            if fam_handle in self.families:
                 return False
         return True
 
