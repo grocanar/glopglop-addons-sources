@@ -544,16 +544,22 @@ class GeneWebPlusWriter:
 
         self.add_source(infos, "#src", person.get_citation_list())
 
+        # The birth and death references are not always set (CSV import
+        # for instance): then use the first birth or death event.
         birth = None
         birth_ref = person.get_birth_ref()
         if birth_ref:
             birth = self.db.get_event_from_handle(birth_ref.ref)
+        if not birth:
+            birth = self.find_event(events, (EventType.BIRTH,))
         bapt = self.find_event(events, (EventType.BAPTISM, EventType.CHRISTEN,
                                         EventType.ADULT_CHRISTEN))
         death = None
         death_ref = person.get_death_ref()
         if death_ref:
             death = self.db.get_event_from_handle(death_ref.ref)
+        if not death:
+            death = self.find_event(events, (EventType.DEATH,))
         burial = self.find_event(events, (EventType.BURIAL,
                                           EventType.CREMATION))
 
