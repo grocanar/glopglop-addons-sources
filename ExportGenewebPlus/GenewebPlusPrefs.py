@@ -35,6 +35,7 @@ _ = glocale.get_addon_translator(__file__).gettext
 CONFIG_NAME = "ExportGenewebPlus"
 INCLUDE_URLS = "options.include_urls"
 INCLUDE_REPOSITORIES = "options.include_repositories"
+BEAUTIFY = "options.beautify"
 
 
 def get_config():
@@ -47,6 +48,7 @@ def get_config():
     config = configman.register_manager(CONFIG_NAME)
     config.register(INCLUDE_URLS, True)
     config.register(INCLUDE_REPOSITORIES, True)
+    config.register(BEAUTIFY, True)
     config.load()
     return config
 
@@ -68,6 +70,9 @@ def add_genewebplus_panel(configdialog):
                               _("Include repository information in sources"),
                               2, INCLUDE_REPOSITORIES, config=config,
                               extra_callback=save)
+    configdialog.add_checkbox(
+        grid, _("Beautify sources (one line per item, values in bold)"), 3,
+        BEAUTIFY, config=config, extra_callback=save)
     return _("GeneWeb plus"), grid
 
 

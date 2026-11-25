@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gramps 60\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 18:48+0100\n"
+"POT-Creation-Date: 2026-11-25 21:34+0100\n"
 "PO-Revision-Date: 2026-11-25 18:18+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: French\n"
@@ -46,60 +46,64 @@ msgstr ""
 "Ajoute un onglet « GeneWeb plus » aux préférences de Gramps, avec les "
 "options de l'export GeneWeb plus"
 
-#: ExportGenewebPlus.py:319
+#: ExportGenewebPlus.py:323
 #, python-format
 msgid "Could not create %s"
 msgstr ""
 
-#: ExportGenewebPlus.py:906
+#: ExportGenewebPlus.py:918
 msgid "Date"
 msgstr ""
 
-#: ExportGenewebPlus.py:909
+#: ExportGenewebPlus.py:921
 msgid "Confidence"
 msgstr ""
 
-#: ExportGenewebPlus.py:914 ExportGenewebPlus.py:936 ExportGenewebPlus.py:954
-#: ExportGenewebPlus.py:969
+#: ExportGenewebPlus.py:926 ExportGenewebPlus.py:948 ExportGenewebPlus.py:966
+#: ExportGenewebPlus.py:983
 msgid "Note"
 msgstr ""
 
-#: ExportGenewebPlus.py:926
+#: ExportGenewebPlus.py:938
 msgid "Author"
 msgstr ""
 
-#: ExportGenewebPlus.py:927
+#: ExportGenewebPlus.py:939
 msgid "Publication"
 msgstr ""
 
-#: ExportGenewebPlus.py:929
+#: ExportGenewebPlus.py:941
 msgid "Abbreviation"
 msgstr ""
 
-#: ExportGenewebPlus.py:948
+#: ExportGenewebPlus.py:960
 msgid "Repository"
 msgstr ""
 
-#: ExportGenewebPlus.py:950
+#: ExportGenewebPlus.py:962
 msgid "Call Number"
 msgstr ""
 
-#: ExportGenewebPlus.py:962
+#: ExportGenewebPlus.py:974
 msgid "Address"
 msgstr ""
 
-#: GenewebPlusPrefs.py:58
+#: GenewebPlusPrefs.py:60
 msgid "GeneWeb plus export"
 msgstr "Export GeneWeb plus"
 
-#: GenewebPlusPrefs.py:64
+#: GenewebPlusPrefs.py:66
 msgid "Include URLs in sources"
 msgstr "Inclure les URL dans les sources"
 
-#: GenewebPlusPrefs.py:68
+#: GenewebPlusPrefs.py:70
 msgid "Include repository information in sources"
 msgstr "Inclure les informations des dépôts dans les sources"
 
-#: GenewebPlusPrefs.py:71
+#: GenewebPlusPrefs.py:74
+msgid "Beautify sources (one line per item, values in bold)"
+msgstr "Embellir les sources (un élément par ligne, valeurs en gras)"
+
+#: GenewebPlusPrefs.py:76
 msgid "GeneWeb plus"
 msgstr "GeneWeb plus"

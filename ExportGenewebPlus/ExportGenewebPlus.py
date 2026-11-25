@@ -56,8 +56,8 @@ from gramps.gen.utils.string import conf_strings
 from gramps.gen.datehandler import displayer as _dd
 from gramps.gen.display.place import displayer as _pd
 
-from GenewebPlusPrefs import (INCLUDE_REPOSITORIES, INCLUDE_URLS,
-                              get_config)
+from GenewebPlusPrefs import (BEAUTIFY, INCLUDE_REPOSITORIES,
+                              INCLUDE_URLS, get_config)
 
 # -------------------------------------------------------------------------
 #
@@ -220,11 +220,6 @@ def gw_string(s, no_num=False, no_colon=False, empty="_"):
 URL_RE = re.compile(r"(?:https?://|www\.)[^\s<>\"']+", re.I)
 
 
-def pair(label, value):
-    """A key/value line of a source, with the value in bold."""
-    return "%s: <b>%s</b>" % (label, value)
-
-
 def linkify(text):
     """Turn the URLs of a text into HTML links, so that they can be
     clicked in GeneWeb. Texts already containing links are kept."""
@@ -268,6 +263,10 @@ class GeneWebPlusWriter:
             self.db = option_box.get_filtered_database(self.db)
         self.include_urls = CONFIG.get(INCLUDE_URLS)
         self.include_repositories = CONFIG.get(INCLUDE_REPOSITORIES)
+        # beautified sources: one line per item, values in bold
+        self.beautify = CONFIG.get(BEAUTIFY)
+        self.part_separator = "<br>" if self.beautify else " - "
+        self.source_separator = "<br><br>" if self.beautify else " ; "
 
         self.names = {}          # person handle -> (surname, firstname)
         self.occ = {}            # person handle -> occurrence number
@@ -878,14 +877,15 @@ class GeneWebPlusWriter:
         sources = [self.citation_text(handle) for handle in citation_list]
         sources = [text for text in dict.fromkeys(sources) if text]
         if sources:
-            line.extend([label, gw_string("<br><br>".join(sources))])
+            line.extend([label,
+                         gw_string(self.source_separator.join(sources))])
 
     def notes_text(self, obj):
         return " ".join(" ".join(note.get().split())
                         for note in self.get_notes(obj))
 
     def attributes_parts(self, obj):
-        return [pair(attr.get_type(), attr.get_value().strip())
+        return [self.pair(attr.get_type(), attr.get_value().strip())
                 for attr in obj.get_attribute_list()
                 if attr.get_value().strip()
                 and (self.include_urls
@@ -894,7 +894,14 @@ class GeneWebPlusWriter:
     def join_parts(self, parts):
         if self.include_urls:
             parts = [linkify(part) for part in parts]
-        return "<br>".join(part for part in parts if part)
+        return self.part_separator.join(part for part in parts if part)
+
+    def pair(self, label, value):
+        """A key/value item of a source, with the value in bold when
+        beautified."""
+        if self.beautify:
+            return "%s: <b>%s</b>" % (label, value)
+        return "%s: %s" % (label, value)
 
     def citation_text(self, handle):
         """Everything known about a citation, its source and the
@@ -908,15 +915,15 @@ class GeneWebPlusWriter:
                      citation.get_page().strip()]
             date = _dd.display(citation.get_date_object())
             if date:
-                parts.append(pair(_("Date"), date))
+                parts.append(self.pair(_("Date"), date))
             if citation.get_confidence_level() != citation.CONF_NORMAL:
-                parts.append(pair(
+                parts.append(self.pair(
                     _("Confidence"),
                     _(conf_strings[citation.get_confidence_level()])))
             parts += self.attributes_parts(citation)
             note = self.notes_text(citation)
             if note:
-                parts.append(pair(_("Note"), note))
+                parts.append(self.pair(_("Note"), note))
             text = self.join_parts(parts)
         self.citation_texts[handle] = text
         return text
@@ -934,11 +941,11 @@ class GeneWebPlusWriter:
                                  (_("Abbreviation"),
                                   source.get_abbreviation())):
                 if value.strip():
-                    parts.append(pair(label, value.strip()))
+                    parts.append(self.pair(label, value.strip()))
             parts += self.attributes_parts(source)
             note = self.notes_text(source)
             if note:
-                parts.append(pair(_("Note"), note))
+                parts.append(self.pair(_("Note"), note))
             if self.include_repositories:
                 for reporef in source.get_reporef_list():
                     parts += self.repository_parts(reporef)
@@ -950,13 +957,13 @@ class GeneWebPlusWriter:
         repo = self.db.get_repository_from_handle(reporef.ref)
         if not repo:
             return []
-        parts = [pair(_("Repository"), repo.get_name().strip())]
+        parts = [self.pair(_("Repository"), repo.get_name().strip())]
         if reporef.get_call_number().strip():
-            parts.append(pair(_("Call Number"),
+            parts.append(self.pair(_("Call Number"),
                                      reporef.get_call_number().strip()))
         note = self.notes_text(reporef)
         if note:
-            parts.append(pair(_("Note"), note))
+            parts.append(self.pair(_("Note"), note))
         for address in repo.get_address_list():
             fields = [address.get_street(), address.get_locality(),
                       address.get_city(), address.get_postal_code(),
@@ -964,16 +971,16 @@ class GeneWebPlusWriter:
                       address.get_country(), address.get_phone()]
             fields = [f.strip() for f in fields if f.strip()]
             if fields:
-                parts.append(pair(_("Address"), ", ".join(fields)))
+                parts.append(self.pair(_("Address"), ", ".join(fields)))
         for url in repo.get_url_list() if self.include_urls else []:
             path = url.get_path().strip()
             if path:
                 description = url.get_description().strip()
-                parts.append(pair(description, path) if description
+                parts.append(self.pair(description, path) if description
                              else path)
         note = self.notes_text(repo)
         if note:
-            parts.append(pair(_("Note"), note))
+            parts.append(self.pair(_("Note"), note))
         return parts
 
     def format_date(self, date, no_colon=False):
