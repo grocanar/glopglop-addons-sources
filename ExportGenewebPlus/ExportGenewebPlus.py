@@ -48,7 +48,6 @@ LOG = logging.getLogger(".ExportGenewebPlus")
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 
 _ = glocale.get_addon_translator(__file__).gettext
-from gramps.gen.config import config as configman
 from gramps.gen.lib import (AttributeType, ChildRefType, Date, EventRoleType,
                             EventType, FamilyRelType, Person)
 from gramps.gui.plug.export import WriterOptionBox
@@ -56,6 +55,9 @@ from gramps.gen.utils.alive import probably_alive
 from gramps.gen.utils.string import conf_strings
 from gramps.gen.datehandler import displayer as _dd
 from gramps.gen.display.place import displayer as _pd
+
+from GenewebPlusPrefs import (INCLUDE_REPOSITORIES, INCLUDE_URLS,
+                              get_config)
 
 # -------------------------------------------------------------------------
 #
@@ -240,51 +242,9 @@ def name_key(s):
     return "".join(c for c in s if c.isalnum())
 
 
-# The choices of the export options are kept for the next export in
-# ExportGenewebPlus.ini, in the Gramps plugins directory.
-CONFIG = configman.register_manager("ExportGenewebPlus")
-CONFIG.register("options.include_urls", True)
-CONFIG.register("options.include_repositories", True)
-CONFIG.load()
-
-
-class GeneWebPlusOptionBox(WriterOptionBox):
-    """The standard export options, plus what to put in the sources."""
-
-    def __init__(self, person, dbstate, uistate, track=[], window=None):
-        WriterOptionBox.__init__(
-            self, person, dbstate, uistate, track=track, window=window
-        )
-        self.include_urls = CONFIG.get("options.include_urls")
-        self.include_repositories = CONFIG.get("options.include_repositories")
-        self.include_urls_check = None
-        self.include_repositories_check = None
-
-    def get_option_box(self):
-        from gi.repository import Gtk
-
-        option_box = WriterOptionBox.get_option_box(self)
-
-        self.include_urls_check = Gtk.CheckButton(
-            label=_("Include URLs in sources"))
-        self.include_repositories_check = Gtk.CheckButton(
-            label=_("Include repository information in sources"))
-        self.include_urls_check.set_active(self.include_urls)
-        self.include_repositories_check.set_active(self.include_repositories)
-        option_box.pack_start(self.include_urls_check, False, True, 0)
-        option_box.pack_start(self.include_repositories_check, False, True, 0)
-        return option_box
-
-    def parse_options(self):
-        WriterOptionBox.parse_options(self)
-        if self.include_urls_check:
-            self.include_urls = self.include_urls_check.get_active()
-            self.include_repositories = \
-                self.include_repositories_check.get_active()
-            CONFIG.set("options.include_urls", self.include_urls)
-            CONFIG.set("options.include_repositories",
-                       self.include_repositories)
-            CONFIG.save()
+# The options of the export are set in the "GeneWeb plus" page of the
+# Gramps preferences (see GenewebPlusPrefs.py).
+CONFIG = get_config()
 
 
 class GeneWebPlusWriter:
@@ -301,10 +261,8 @@ class GeneWebPlusWriter:
         if option_box:
             self.option_box.parse_options()
             self.db = option_box.get_filtered_database(self.db)
-        # also used with the plain WriterOptionBox (command line)
-        self.include_urls = getattr(option_box, "include_urls", True)
-        self.include_repositories = getattr(option_box,
-                                            "include_repositories", True)
+        self.include_urls = CONFIG.get(INCLUDE_URLS)
+        self.include_repositories = CONFIG.get(INCLUDE_REPOSITORIES)
 
         self.names = {}          # person handle -> (surname, firstname)
         self.occ = {}            # person handle -> occurrence number

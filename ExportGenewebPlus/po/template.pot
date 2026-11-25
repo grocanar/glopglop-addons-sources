@@ -8,79 +8,95 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 18:18+0100\n"
+"POT-Creation-Date: 2026-11-25 18:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:5
+#: ExportGenewebPlus.gpr.py:5
 msgid "GeneWeb plus (gwplus)"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:6
+#: ExportGenewebPlus.gpr.py:6
 msgid "GeneWeb _plus (gwplus)"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:7
+#: ExportGenewebPlus.gpr.py:7
 msgid "Export to GeneWeb gwplus format (GeneWeb 7, Geneanet)"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:16
+#: ExportGenewebPlus.gpr.py:16
 msgid "GeneWeb plus export options"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:269
-msgid "Include URLs in sources"
+#: ExportGenewebPlus.gpr.py:22
+msgid "GeneWeb plus export preferences"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:271
-msgid "Include repository information in sources"
+#: ExportGenewebPlus.gpr.py:23
+msgid ""
+"Adds a \"GeneWeb plus\" page to the Gramps preferences, with the options of "
+"the GeneWeb plus export"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:361
+#: ExportGenewebPlus.py:319
 #, python-format
 msgid "Could not create %s"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:942
+#: ExportGenewebPlus.py:906
 msgid "Date"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:945
+#: ExportGenewebPlus.py:909
 msgid "Confidence"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:950
-#: ExportGenewebPlus/ExportGenewebPlus.py:972
-#: ExportGenewebPlus/ExportGenewebPlus.py:990
-#: ExportGenewebPlus/ExportGenewebPlus.py:1005
+#: ExportGenewebPlus.py:914 ExportGenewebPlus.py:936 ExportGenewebPlus.py:954
+#: ExportGenewebPlus.py:969
 msgid "Note"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:962
+#: ExportGenewebPlus.py:926
 msgid "Author"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:963
+#: ExportGenewebPlus.py:927
 msgid "Publication"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:965
+#: ExportGenewebPlus.py:929
 msgid "Abbreviation"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:984
+#: ExportGenewebPlus.py:948
 msgid "Repository"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:986
+#: ExportGenewebPlus.py:950
 msgid "Call Number"
 msgstr ""
 
-#: ExportGenewebPlus/ExportGenewebPlus.py:998
+#: ExportGenewebPlus.py:962
 msgid "Address"
+msgstr ""
+
+#: GenewebPlusPrefs.py:58
+msgid "GeneWeb plus export"
+msgstr ""
+
+#: GenewebPlusPrefs.py:64
+msgid "Include URLs in sources"
+msgstr ""
+
+#: GenewebPlusPrefs.py:68
+msgid "Include repository information in sources"
+msgstr ""
+
+#: GenewebPlusPrefs.py:71
+msgid "GeneWeb plus"
 msgstr ""
