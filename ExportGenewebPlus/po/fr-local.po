@@ -1,0 +1,87 @@
+# French translations for gramps package
+# Traductions françaises du paquet gramps.
+# Copyright (C) 2026 THE gramps'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gramps package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gramps 60\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-25 18:18+0100\n"
+"PO-Revision-Date: 2026-11-25 18:18+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:5
+msgid "GeneWeb plus (gwplus)"
+msgstr "GeneWeb plus (gwplus)"
+
+#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:6
+msgid "GeneWeb _plus (gwplus)"
+msgstr "GeneWeb _plus (gwplus)"
+
+#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:7
+msgid "Export to GeneWeb gwplus format (GeneWeb 7, Geneanet)"
+msgstr "Export au format GeneWeb gwplus (GeneWeb 7, Geneanet)"
+
+#: ExportGenewebPlus/ExportGenewebPlus.gpr.py:16
+msgid "GeneWeb plus export options"
+msgstr "Options d'export GeneWeb plus"
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:269
+msgid "Include URLs in sources"
+msgstr "Inclure les URL dans les sources"
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:271
+msgid "Include repository information in sources"
+msgstr "Inclure les informations des dépôts dans les sources"
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:361
+#, python-format
+msgid "Could not create %s"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:942
+msgid "Date"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:945
+msgid "Confidence"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:950
+#: ExportGenewebPlus/ExportGenewebPlus.py:972
+#: ExportGenewebPlus/ExportGenewebPlus.py:990
+#: ExportGenewebPlus/ExportGenewebPlus.py:1005
+msgid "Note"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:962
+msgid "Author"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:963
+msgid "Publication"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:965
+msgid "Abbreviation"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:984
+msgid "Repository"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:986
+msgid "Call Number"
+msgstr ""
+
+#: ExportGenewebPlus/ExportGenewebPlus.py:998
+msgid "Address"
+msgstr ""

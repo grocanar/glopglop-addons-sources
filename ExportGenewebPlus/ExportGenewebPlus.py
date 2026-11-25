@@ -47,7 +47,8 @@ LOG = logging.getLogger(".ExportGenewebPlus")
 # -------------------------------------------------------------------------
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 
-_ = glocale.translation.gettext
+_ = glocale.get_addon_translator(__file__).gettext
+from gramps.gen.config import config as configman
 from gramps.gen.lib import (AttributeType, ChildRefType, Date, EventRoleType,
                             EventType, FamilyRelType, Person)
 from gramps.gui.plug.export import WriterOptionBox
@@ -239,6 +240,53 @@ def name_key(s):
     return "".join(c for c in s if c.isalnum())
 
 
+# The choices of the export options are kept for the next export in
+# ExportGenewebPlus.ini, in the Gramps plugins directory.
+CONFIG = configman.register_manager("ExportGenewebPlus")
+CONFIG.register("options.include_urls", True)
+CONFIG.register("options.include_repositories", True)
+CONFIG.load()
+
+
+class GeneWebPlusOptionBox(WriterOptionBox):
+    """The standard export options, plus what to put in the sources."""
+
+    def __init__(self, person, dbstate, uistate, track=[], window=None):
+        WriterOptionBox.__init__(
+            self, person, dbstate, uistate, track=track, window=window
+        )
+        self.include_urls = CONFIG.get("options.include_urls")
+        self.include_repositories = CONFIG.get("options.include_repositories")
+        self.include_urls_check = None
+        self.include_repositories_check = None
+
+    def get_option_box(self):
+        from gi.repository import Gtk
+
+        option_box = WriterOptionBox.get_option_box(self)
+
+        self.include_urls_check = Gtk.CheckButton(
+            label=_("Include URLs in sources"))
+        self.include_repositories_check = Gtk.CheckButton(
+            label=_("Include repository information in sources"))
+        self.include_urls_check.set_active(self.include_urls)
+        self.include_repositories_check.set_active(self.include_repositories)
+        option_box.pack_start(self.include_urls_check, False, True, 0)
+        option_box.pack_start(self.include_repositories_check, False, True, 0)
+        return option_box
+
+    def parse_options(self):
+        WriterOptionBox.parse_options(self)
+        if self.include_urls_check:
+            self.include_urls = self.include_urls_check.get_active()
+            self.include_repositories = \
+                self.include_repositories_check.get_active()
+            CONFIG.set("options.include_urls", self.include_urls)
+            CONFIG.set("options.include_repositories",
+                       self.include_repositories)
+            CONFIG.save()
+
+
 class GeneWebPlusWriter:
     def __init__(self, database, filename, user, option_box=None):
         self.db = database
@@ -253,6 +301,10 @@ class GeneWebPlusWriter:
         if option_box:
             self.option_box.parse_options()
             self.db = option_box.get_filtered_database(self.db)
+        # also used with the plain WriterOptionBox (command line)
+        self.include_urls = getattr(option_box, "include_urls", True)
+        self.include_repositories = getattr(option_box,
+                                            "include_repositories", True)
 
         self.names = {}          # person handle -> (surname, firstname)
         self.occ = {}            # person handle -> occurrence number
@@ -863,11 +915,17 @@ class GeneWebPlusWriter:
         return " ".join(" ".join(note.get().split())
                         for note in self.get_notes(obj))
 
-    @staticmethod
-    def attributes_parts(obj):
+    def attributes_parts(self, obj):
         return ["%s: %s" % (attr.get_type(), attr.get_value().strip())
                 for attr in obj.get_attribute_list()
-                if attr.get_value().strip()]
+                if attr.get_value().strip()
+                and (self.include_urls
+                     or not URL_RE.search(attr.get_value()))]
+
+    def join_parts(self, parts):
+        if self.include_urls:
+            parts = [linkify(part) for part in parts]
+        return " - ".join(part for part in parts if part)
 
     def citation_text(self, handle):
         """Everything known about a citation, its source and the
@@ -890,7 +948,7 @@ class GeneWebPlusWriter:
             note = self.notes_text(citation)
             if note:
                 parts.append("%s: %s" % (_("Note"), note))
-            text = " - ".join(linkify(part) for part in parts if part)
+            text = self.join_parts(parts)
         self.citation_texts[handle] = text
         return text
 
@@ -912,9 +970,10 @@ class GeneWebPlusWriter:
             note = self.notes_text(source)
             if note:
                 parts.append("%s: %s" % (_("Note"), note))
-            for reporef in source.get_reporef_list():
-                parts += self.repository_parts(reporef)
-        text = " - ".join(linkify(part) for part in parts if part)
+            if self.include_repositories:
+                for reporef in source.get_reporef_list():
+                    parts += self.repository_parts(reporef)
+        text = self.join_parts(parts)
         self.source_texts[handle] = text
         return text
 
@@ -937,7 +996,7 @@ class GeneWebPlusWriter:
             fields = [f.strip() for f in fields if f.strip()]
             if fields:
                 parts.append("%s: %s" % (_("Address"), ", ".join(fields)))
-        for url in repo.get_url_list():
+        for url in repo.get_url_list() if self.include_urls else []:
             if url.get_path().strip():
                 parts.append(" ".join(filter(None, (
                     url.get_description().strip(), url.get_path().strip()))))

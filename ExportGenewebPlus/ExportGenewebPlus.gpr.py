@@ -12,7 +12,7 @@ register(EXPORT,
          status = STABLE,
          fname = 'ExportGenewebPlus.py',
          export_function = 'exportData',
-         export_options = 'WriterOptionBox',
+         export_options = 'GeneWebPlusOptionBox',
          export_options_title = _('GeneWeb plus export options'),
          extension = "gwplus.gw"
          )
