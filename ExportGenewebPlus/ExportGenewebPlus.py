@@ -27,6 +27,7 @@
 # Standard Python Modules
 #
 # -------------------------------------------------------------------------
+import re
 import unicodedata
 from collections import abc
 
@@ -51,6 +52,7 @@ from gramps.gen.lib import (AttributeType, ChildRefType, Date, EventRoleType,
                             EventType, FamilyRelType, Person)
 from gramps.gui.plug.export import WriterOptionBox
 from gramps.gen.utils.alive import probably_alive
+from gramps.gen.utils.string import conf_strings
 from gramps.gen.datehandler import displayer as _dd
 from gramps.gen.display.place import displayer as _pd
 
@@ -212,6 +214,24 @@ def gw_string(s, no_num=False, no_colon=False, empty="_"):
     return "".join(out)
 
 
+URL_RE = re.compile(r"(?:https?://|www\.)[^\s<>\"']+", re.I)
+
+
+def linkify(text):
+    """Turn the URLs of a text into HTML links, so that they can be
+    clicked in GeneWeb. Texts already containing links are kept."""
+    if "<a " in text.lower():
+        return text
+
+    def link(match):
+        url = match.group(0).rstrip(".,;)")
+        rest = match.group(0)[len(url):]
+        href = url if "://" in url else "http://" + url
+        return '<a href="%s">%s</a>%s' % (href, url, rest)
+
+    return URL_RE.sub(link, text)
+
+
 def name_key(s):
     """Coarser than GeneWeb's Name.lower, so that two persons GeneWeb
     would consider identical always get distinct occurrence numbers."""
@@ -240,6 +260,8 @@ class GeneWebPlusWriter:
         self.defined = set()     # persons whose data has been written
         self.witnesses = {}      # event handle -> [(person handle, kind)]
         self.relations = {}      # person handle -> [relation lines]
+        self.source_texts = {}   # source handle -> text
+        self.citation_texts = {} # citation handle -> text
 
     def update_empty(self):
         pass
@@ -832,23 +854,97 @@ class GeneWebPlusWriter:
             line.extend([label, gw_string(place)])
 
     def add_source(self, line, label, citation_list):
-        sources = []
-        for handle in citation_list:
-            citation = self.db.get_citation_from_handle(handle)
-            if not citation:
-                continue
-            source = self.db.get_source_from_handle(
-                citation.get_reference_handle())
-            if not source:
-                continue
-            text = source.get_title().strip()
-            page = citation.get_page().strip()
-            if page:
-                text = "%s - %s" % (text, page) if text else page
-            if text:
-                sources.append(text)
+        sources = [self.citation_text(handle) for handle in citation_list]
+        sources = [text for text in dict.fromkeys(sources) if text]
         if sources:
-            line.extend([label, gw_string(", ".join(dict.fromkeys(sources)))])
+            line.extend([label, gw_string(" ; ".join(sources))])
+
+    def notes_text(self, obj):
+        return " ".join(" ".join(note.get().split())
+                        for note in self.get_notes(obj))
+
+    @staticmethod
+    def attributes_parts(obj):
+        return ["%s: %s" % (attr.get_type(), attr.get_value().strip())
+                for attr in obj.get_attribute_list()
+                if attr.get_value().strip()]
+
+    def citation_text(self, handle):
+        """Everything known about a citation, its source and the
+        repositories of the source, as one line."""
+        if handle in self.citation_texts:
+            return self.citation_texts[handle]
+        citation = self.db.get_citation_from_handle(handle)
+        text = ""
+        if citation:
+            parts = [self.source_text(citation.get_reference_handle()),
+                     citation.get_page().strip()]
+            date = _dd.display(citation.get_date_object())
+            if date:
+                parts.append("%s: %s" % (_("Date"), date))
+            if citation.get_confidence_level() != citation.CONF_NORMAL:
+                parts.append("%s: %s" % (
+                    _("Confidence"),
+                    _(conf_strings[citation.get_confidence_level()])))
+            parts += self.attributes_parts(citation)
+            note = self.notes_text(citation)
+            if note:
+                parts.append("%s: %s" % (_("Note"), note))
+            text = " - ".join(linkify(part) for part in parts if part)
+        self.citation_texts[handle] = text
+        return text
+
+    def source_text(self, handle):
+        if handle in self.source_texts:
+            return self.source_texts[handle]
+        source = self.db.get_source_from_handle(handle)
+        parts = []
+        if source:
+            parts.append(source.get_title().strip())
+            for label, value in ((_("Author"), source.get_author()),
+                                 (_("Publication"),
+                                  source.get_publication_info()),
+                                 (_("Abbreviation"),
+                                  source.get_abbreviation())):
+                if value.strip():
+                    parts.append("%s: %s" % (label, value.strip()))
+            parts += self.attributes_parts(source)
+            note = self.notes_text(source)
+            if note:
+                parts.append("%s: %s" % (_("Note"), note))
+            for reporef in source.get_reporef_list():
+                parts += self.repository_parts(reporef)
+        text = " - ".join(linkify(part) for part in parts if part)
+        self.source_texts[handle] = text
+        return text
+
+    def repository_parts(self, reporef):
+        repo = self.db.get_repository_from_handle(reporef.ref)
+        if not repo:
+            return []
+        parts = ["%s: %s" % (_("Repository"), repo.get_name().strip())]
+        if reporef.get_call_number().strip():
+            parts.append("%s: %s" % (_("Call Number"),
+                                     reporef.get_call_number().strip()))
+        note = self.notes_text(reporef)
+        if note:
+            parts.append("%s: %s" % (_("Note"), note))
+        for address in repo.get_address_list():
+            fields = [address.get_street(), address.get_locality(),
+                      address.get_city(), address.get_postal_code(),
+                      address.get_county(), address.get_state(),
+                      address.get_country(), address.get_phone()]
+            fields = [f.strip() for f in fields if f.strip()]
+            if fields:
+                parts.append("%s: %s" % (_("Address"), ", ".join(fields)))
+        for url in repo.get_url_list():
+            if url.get_path().strip():
+                parts.append(" ".join(filter(None, (
+                    url.get_description().strip(), url.get_path().strip()))))
+        note = self.notes_text(repo)
+        if note:
+            parts.append("%s: %s" % (_("Note"), note))
+        return parts
 
     def format_date(self, date, no_colon=False):
         """Date in GeneWeb format, "" if empty."""
