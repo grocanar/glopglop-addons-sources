@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 21:34+0100\n"
+"POT-Creation-Date: 2026-11-25 21:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,64 +43,72 @@ msgid ""
 "the GeneWeb plus export"
 msgstr ""
 
-#: ExportGenewebPlus.py:323
+#: ExportGenewebPlus.py:325 ExportGenewebPlus.py:1038
 #, python-format
 msgid "Could not create %s"
 msgstr ""
 
-#: ExportGenewebPlus.py:918
+#: ExportGenewebPlus.py:920
 msgid "Date"
 msgstr ""
 
-#: ExportGenewebPlus.py:921
+#: ExportGenewebPlus.py:923
 msgid "Confidence"
 msgstr ""
 
-#: ExportGenewebPlus.py:926 ExportGenewebPlus.py:948 ExportGenewebPlus.py:966
-#: ExportGenewebPlus.py:983
+#: ExportGenewebPlus.py:928 ExportGenewebPlus.py:950 ExportGenewebPlus.py:968
+#: ExportGenewebPlus.py:985
 msgid "Note"
 msgstr ""
 
-#: ExportGenewebPlus.py:938
+#: ExportGenewebPlus.py:940
 msgid "Author"
 msgstr ""
 
-#: ExportGenewebPlus.py:939
+#: ExportGenewebPlus.py:941
 msgid "Publication"
 msgstr ""
 
-#: ExportGenewebPlus.py:941
+#: ExportGenewebPlus.py:943
 msgid "Abbreviation"
 msgstr ""
 
-#: ExportGenewebPlus.py:960
+#: ExportGenewebPlus.py:962
 msgid "Repository"
 msgstr ""
 
-#: ExportGenewebPlus.py:962
+#: ExportGenewebPlus.py:964
 msgid "Call Number"
 msgstr ""
 
-#: ExportGenewebPlus.py:974
+#: ExportGenewebPlus.py:976
 msgid "Address"
 msgstr ""
 
-#: GenewebPlusPrefs.py:60
-msgid "GeneWeb plus export"
+#: GenewebPlusPrefs.py:72
+msgid "General"
 msgstr ""
 
-#: GenewebPlusPrefs.py:66
-msgid "Include URLs in sources"
-msgstr ""
-
-#: GenewebPlusPrefs.py:70
-msgid "Include repository information in sources"
-msgstr ""
-
-#: GenewebPlusPrefs.py:74
-msgid "Beautify sources (one line per item, values in bold)"
+#: GenewebPlusPrefs.py:73
+msgid "Compress the exported file (zip)"
 msgstr ""
 
 #: GenewebPlusPrefs.py:76
+msgid "Sources"
+msgstr ""
+
+#: GenewebPlusPrefs.py:77
+msgid "Include URLs in sources"
+msgstr ""
+
+#: GenewebPlusPrefs.py:81
+msgid "Include repository information in sources"
+msgstr ""
+
+#: GenewebPlusPrefs.py:85
+msgid "Beautify sources (one line per item, values in bold)"
+msgstr ""
+
+#: GenewebPlusPrefs.py:87
 msgid "GeneWeb plus"
 msgstr ""

@@ -36,6 +36,7 @@ CONFIG_NAME = "ExportGenewebPlus"
 INCLUDE_URLS = "options.include_urls"
 INCLUDE_REPOSITORIES = "options.include_repositories"
 BEAUTIFY = "options.beautify"
+COMPRESS = "options.compress"
 
 
 def get_config():
@@ -49,6 +50,7 @@ def get_config():
     config.register(INCLUDE_URLS, True)
     config.register(INCLUDE_REPOSITORIES, True)
     config.register(BEAUTIFY, True)
+    config.register(COMPRESS, False)
     config.load()
     return config
 
@@ -57,21 +59,30 @@ def add_genewebplus_panel(configdialog):
     """The "GeneWeb plus" page of the Gramps preferences."""
     config = get_config()
     grid = configdialog.create_grid()
-    configdialog.add_text(grid, _("GeneWeb plus export"), 0,
-                          line_wrap=True, bold=True, start=0, stop=7)
 
     def save(_obj):
         config.save()
 
-    configdialog.add_checkbox(grid, _("Include URLs in sources"), 1,
+    def section(title, row):
+        label = configdialog.add_text(grid, title, row, line_wrap=True,
+                                      bold=True, start=0, stop=7)
+        if row:
+            label.set_margin_top(10)
+
+    section(_("General"), 0)
+    configdialog.add_checkbox(grid, _("Compress the exported file (zip)"), 1,
+                              COMPRESS, config=config, extra_callback=save)
+
+    section(_("Sources"), 2)
+    configdialog.add_checkbox(grid, _("Include URLs in sources"), 3,
                               INCLUDE_URLS, config=config,
                               extra_callback=save)
     configdialog.add_checkbox(grid,
                               _("Include repository information in sources"),
-                              2, INCLUDE_REPOSITORIES, config=config,
+                              4, INCLUDE_REPOSITORIES, config=config,
                               extra_callback=save)
     configdialog.add_checkbox(
-        grid, _("Beautify sources (one line per item, values in bold)"), 3,
+        grid, _("Beautify sources (one line per item, values in bold)"), 5,
         BEAUTIFY, config=config, extra_callback=save)
     return _("GeneWeb plus"), grid
 

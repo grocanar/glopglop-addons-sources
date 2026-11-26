@@ -27,7 +27,9 @@
 # Standard Python Modules
 #
 # -------------------------------------------------------------------------
+import os
 import re
+import zipfile
 import unicodedata
 from collections import abc
 
@@ -56,7 +58,7 @@ from gramps.gen.utils.string import conf_strings
 from gramps.gen.datehandler import displayer as _dd
 from gramps.gen.display.place import displayer as _pd
 
-from GenewebPlusPrefs import (BEAUTIFY, INCLUDE_REPOSITORIES,
+from GenewebPlusPrefs import (BEAUTIFY, COMPRESS, INCLUDE_REPOSITORIES,
                               INCLUDE_URLS, get_config)
 
 # -------------------------------------------------------------------------
@@ -1023,6 +1025,25 @@ class GeneWebPlusWriter:
 #
 #
 # -------------------------------------------------------------------------
+def compress(filename, user):
+    """Replace the exported file by a zip archive holding it:
+    name.gwplus.gw becomes name.gwplus.zip."""
+    base = filename[:-3] if filename.endswith(".gw") else filename
+    zipname = base + ".zip"
+    try:
+        with zipfile.ZipFile(zipname, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.write(filename, os.path.basename(filename))
+        os.remove(filename)
+    except (IOError, OSError, zipfile.BadZipFile) as msg:
+        user.notify_error(_("Could not create %s") % zipname, str(msg))
+        return False
+    return True
+
+
 def exportData(database, filename, user, option_box=None):
     gw = GeneWebPlusWriter(database, filename, user, option_box)
-    return gw.export_data()
+    if not gw.export_data():
+        return False
+    if CONFIG.get(COMPRESS):
+        return compress(filename, user)
+    return True
