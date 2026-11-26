@@ -37,6 +37,7 @@ INCLUDE_URLS = "options.include_urls"
 INCLUDE_REPOSITORIES = "options.include_repositories"
 BEAUTIFY = "options.beautify"
 COMPRESS = "options.compress"
+INCLUDE_WITNESSES = "options.include_witnesses"
 
 
 def get_config():
@@ -51,6 +52,7 @@ def get_config():
     config.register(INCLUDE_REPOSITORIES, True)
     config.register(BEAUTIFY, True)
     config.register(COMPRESS, False)
+    config.register(INCLUDE_WITNESSES, True)
     config.load()
     return config
 
@@ -84,6 +86,11 @@ def add_genewebplus_panel(configdialog):
     configdialog.add_checkbox(
         grid, _("Beautify sources (one line per item, values in bold)"), 5,
         BEAUTIFY, config=config, extra_callback=save)
+
+    section(_("Events"), 6)
+    configdialog.add_checkbox(grid, _("Include witnesses"), 7,
+                              INCLUDE_WITNESSES, config=config,
+                              extra_callback=save)
     return _("GeneWeb plus"), grid
 
 

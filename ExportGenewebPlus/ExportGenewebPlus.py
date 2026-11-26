@@ -59,7 +59,8 @@ from gramps.gen.datehandler import displayer as _dd
 from gramps.gen.display.place import displayer as _pd
 
 from GenewebPlusPrefs import (BEAUTIFY, COMPRESS, INCLUDE_REPOSITORIES,
-                              INCLUDE_URLS, get_config)
+                              INCLUDE_URLS, INCLUDE_WITNESSES,
+                              get_config)
 
 # -------------------------------------------------------------------------
 #
@@ -267,6 +268,7 @@ class GeneWebPlusWriter:
         self.include_repositories = CONFIG.get(INCLUDE_REPOSITORIES)
         # beautified sources: one line per item, values in bold
         self.beautify = CONFIG.get(BEAUTIFY)
+        self.include_witnesses = CONFIG.get(INCLUDE_WITNESSES)
         self.part_separator = "<br>" if self.beautify else " - "
         self.source_separator = "<br><br>" if self.beautify else " ; "
 
@@ -355,7 +357,8 @@ class GeneWebPlusWriter:
                     self.main_family[handle] = fam_handle
                     break
 
-            for event_ref in person.get_event_ref_list():
+            for event_ref in (person.get_event_ref_list()
+                              if self.include_witnesses else []):
                 kind = self.witness_kind(event_ref.get_role())
                 if kind is not None:
                     self.witnesses.setdefault(event_ref.ref, []).append(
