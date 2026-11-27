@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-27 21:47+0100\n"
+"POT-Creation-Date: 2026-11-27 23:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,94 +43,102 @@ msgid ""
 "the GeneWeb plus export"
 msgstr ""
 
-#: ExportGenewebPlus.py:429 ExportGenewebPlus.py:1149
+#: ExportGenewebPlus.py:435 ExportGenewebPlus.py:1172
 #, python-format
 msgid "Could not create %s"
 msgstr ""
 
-#: ExportGenewebPlus.py:1031
-msgid "Date"
-msgstr ""
-
-#: ExportGenewebPlus.py:1034
-msgid "Confidence"
-msgstr ""
-
-#: ExportGenewebPlus.py:1039 ExportGenewebPlus.py:1061
-#: ExportGenewebPlus.py:1079 ExportGenewebPlus.py:1096
-msgid "Note"
-msgstr ""
-
-#: ExportGenewebPlus.py:1051
-msgid "Author"
-msgstr ""
-
-#: ExportGenewebPlus.py:1052
-msgid "Publication"
+#: ExportGenewebPlus.py:938
+msgid "Place name at the time"
 msgstr ""
 
 #: ExportGenewebPlus.py:1054
-msgid "Abbreviation"
+msgid "Date"
 msgstr ""
 
-#: ExportGenewebPlus.py:1073
-msgid "Repository"
+#: ExportGenewebPlus.py:1057
+msgid "Confidence"
+msgstr ""
+
+#: ExportGenewebPlus.py:1062 ExportGenewebPlus.py:1084
+#: ExportGenewebPlus.py:1102 ExportGenewebPlus.py:1119
+msgid "Note"
+msgstr ""
+
+#: ExportGenewebPlus.py:1074
+msgid "Author"
 msgstr ""
 
 #: ExportGenewebPlus.py:1075
+msgid "Publication"
+msgstr ""
+
+#: ExportGenewebPlus.py:1077
+msgid "Abbreviation"
+msgstr ""
+
+#: ExportGenewebPlus.py:1096
+msgid "Repository"
+msgstr ""
+
+#: ExportGenewebPlus.py:1098
 msgid "Call Number"
 msgstr ""
 
-#: ExportGenewebPlus.py:1087
+#: ExportGenewebPlus.py:1110
 msgid "Address"
 msgstr ""
 
-#: GenewebPlusPrefs.py:89
+#: GenewebPlusPrefs.py:92
 msgid "General"
 msgstr ""
 
-#: GenewebPlusPrefs.py:90
+#: GenewebPlusPrefs.py:93
 msgid "Compress the exported file (zip)"
 msgstr ""
 
-#: GenewebPlusPrefs.py:91
+#: GenewebPlusPrefs.py:94
 msgid "Exclude private data"
 msgstr ""
 
-#: GenewebPlusPrefs.py:92
+#: GenewebPlusPrefs.py:95
 msgid "Sources"
 msgstr ""
 
-#: GenewebPlusPrefs.py:93
+#: GenewebPlusPrefs.py:96
 msgid "Include URLs in sources"
 msgstr ""
 
-#: GenewebPlusPrefs.py:94
+#: GenewebPlusPrefs.py:97
 msgid "Include repository information in sources"
 msgstr ""
 
-#: GenewebPlusPrefs.py:96
+#: GenewebPlusPrefs.py:99
 msgid "Beautify sources (one line per item, values in bold)"
 msgstr ""
 
-#: GenewebPlusPrefs.py:100
+#: GenewebPlusPrefs.py:103
 msgid "Events"
 msgstr ""
 
-#: GenewebPlusPrefs.py:101
+#: GenewebPlusPrefs.py:104
 msgid "Include witnesses"
 msgstr ""
 
-#: GenewebPlusPrefs.py:102
+#: GenewebPlusPrefs.py:105
 msgid "Places"
 msgstr ""
 
-#: GenewebPlusPrefs.py:103
+#: GenewebPlusPrefs.py:106
 msgid ""
 "Geneanet place format ([ hamlet ] - Town, postal code, County, State, "
 "Country)"
 msgstr ""
 
-#: GenewebPlusPrefs.py:105
+#: GenewebPlusPrefs.py:109
+msgid "Add the name of the place at the date of the event as a note"
+msgstr ""
+
+#: GenewebPlusPrefs.py:120
 msgid "GeneWeb plus"
 msgstr ""

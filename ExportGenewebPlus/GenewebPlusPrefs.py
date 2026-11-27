@@ -40,6 +40,7 @@ COMPRESS = "options.compress"
 INCLUDE_WITNESSES = "options.include_witnesses"
 GENEANET_PLACES = "options.geneanet_places"
 EXCLUDE_PRIVATE = "options.exclude_private"
+PLACE_AT_EVENT = "options.place_at_event"
 
 
 def get_config():
@@ -57,6 +58,7 @@ def get_config():
     config.register(INCLUDE_WITNESSES, True)
     config.register(GENEANET_PLACES, False)
     config.register(EXCLUDE_PRIVATE, True)
+    config.register(PLACE_AT_EVENT, False)
     config.load()
     return config
 
@@ -84,6 +86,7 @@ def add_genewebplus_panel(configdialog):
         check.get_child().set_line_wrap(True)
         check.get_child().set_max_width_chars(40)
         check.set_hexpand(True)
+        return check
 
     # left column
     section(_("General"), 0, 0)
@@ -100,8 +103,20 @@ def add_genewebplus_panel(configdialog):
     section(_("Events"), 0, 1)
     option(_("Include witnesses"), 1, 1, INCLUDE_WITNESSES)
     section(_("Places"), 3, 1)
-    option(_("Geneanet place format ([ hamlet ] - Town, postal code, "
-             "County, State, Country)"), 4, 1, GENEANET_PLACES)
+    geneanet = option(_("Geneanet place format ([ hamlet ] - Town, postal "
+                        "code, County, State, Country)"), 4, 1,
+                      GENEANET_PLACES)
+    at_event = option(_("Add the name of the place at the date of the event "
+                        "as a note"), 5, 1, PLACE_AT_EVENT)
+    at_event.set_margin_start(20)
+
+    # the places are written with their current name only in the Geneanet
+    # format: the name at the date of the event has no use otherwise
+    def update_sensitive(_obj=None):
+        at_event.set_sensitive(geneanet.get_active())
+
+    geneanet.connect("toggled", update_sensitive)
+    update_sensitive()
     return _("GeneWeb plus"), grid
 
 

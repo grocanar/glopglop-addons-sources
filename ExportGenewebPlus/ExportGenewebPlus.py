@@ -66,7 +66,8 @@ from gramps.gen.utils.location import get_location_list
 from GenewebPlusPrefs import (BEAUTIFY, COMPRESS, EXCLUDE_PRIVATE,
                               INCLUDE_REPOSITORIES,
                               GENEANET_PLACES, INCLUDE_URLS,
-                              INCLUDE_WITNESSES, get_config)
+                              INCLUDE_WITNESSES, PLACE_AT_EVENT,
+                              get_config)
 
 # -------------------------------------------------------------------------
 #
@@ -374,6 +375,7 @@ class GeneWebPlusWriter:
         self.beautify = CONFIG.get(BEAUTIFY)
         self.include_witnesses = CONFIG.get(INCLUDE_WITNESSES)
         self.geneanet_places = CONFIG.get(GENEANET_PLACES)
+        self.place_at_event = CONFIG.get(PLACE_AT_EVENT)
         self.place_texts = {}    # place handle -> Geneanet place text
         self.part_separator = "<br>" if self.beautify else " - "
         self.source_separator = "<br><br>" if self.beautify else " ; "
@@ -931,6 +933,9 @@ class GeneWebPlusWriter:
                 and event.get_description().strip():
             notes.append(event.get_description().strip())
         notes += [note.get() for note in self.get_notes(event)]
+        old_name = self.place_name_at_event(event)
+        if old_name:
+            notes.append("%s : %s" % (_("Place name at the time"), old_name))
         for line in "\n".join(notes).strip().splitlines():
             line = line.rstrip()
             self.writeln("note " + line if line else "note")
@@ -984,6 +989,20 @@ class GeneWebPlusWriter:
             place = self.db.get_place_from_handle(handle)
             self.place_texts[handle] = geneanet_place(self.db, place)
         return self.place_texts[handle]
+
+    def place_name_at_event(self, event):
+        """With the places written with their current name (Geneanet), the
+        name of the place at the date of the event, if it was different."""
+        handle = event.get_place_handle()
+        if not (handle and self.geneanet_places and self.place_at_event):
+            return ""
+        place = self.db.get_place_from_handle(handle)
+        if not place:
+            return ""
+        then = _pd.display(self.db, place, event.get_date_object())
+        if then == _pd.display(self.db, place, Today()):
+            return ""
+        return then
 
     def add_place(self, line, label, event):
         place = self.place(event)
