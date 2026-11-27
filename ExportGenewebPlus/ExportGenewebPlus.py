@@ -255,12 +255,12 @@ def name_key(s):
 # Places in the Geneanet format:
 #   [ hamlet - street ] - Town, postal code, County, State, Country
 # The levels below the town go in brackets; missing levels keep their
-# place with empty commas.
+# place with empty commas. A place of unknown type is written as it is.
 # ---------------------------------------------------------------------
 SUBTOWN_TYPES = (PlaceType.NUMBER, PlaceType.BUILDING, PlaceType.FARM,
                  PlaceType.HAMLET, PlaceType.NEIGHBORHOOD, PlaceType.STREET,
                  PlaceType.PARISH, PlaceType.LOCALITY, PlaceType.BOROUGH,
-                 PlaceType.UNKNOWN, PlaceType.CUSTOM)
+                 PlaceType.CUSTOM)
 TOWN_TYPES = (PlaceType.CITY, PlaceType.VILLAGE, PlaceType.TOWN,
               PlaceType.MUNICIPALITY)
 COUNTY_TYPES = (PlaceType.COUNTY, PlaceType.DEPARTMENT)
@@ -314,6 +314,10 @@ def geneanet_place(db, place):
     text = ""
     level = 0      # level of the last place written below the country
     for name, place_type in names:
+        if int(place_type) == PlaceType.UNKNOWN:
+            # unknown type: the name is written as it is, without brackets
+            text = text + ", " + name if text else name
+            continue
         new = place_level(place_type)
         if new == 0:
             continue
