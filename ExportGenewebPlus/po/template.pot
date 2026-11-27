@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-26 18:08+0100\n"
+"POT-Creation-Date: 2026-11-26 19:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,80 +43,90 @@ msgid ""
 "the GeneWeb plus export"
 msgstr ""
 
-#: ExportGenewebPlus.py:327 ExportGenewebPlus.py:1041
+#: ExportGenewebPlus.py:425 ExportGenewebPlus.py:1145
 #, python-format
 msgid "Could not create %s"
 msgstr ""
 
-#: ExportGenewebPlus.py:923
+#: ExportGenewebPlus.py:1027
 msgid "Date"
 msgstr ""
 
-#: ExportGenewebPlus.py:926
+#: ExportGenewebPlus.py:1030
 msgid "Confidence"
 msgstr ""
 
-#: ExportGenewebPlus.py:931 ExportGenewebPlus.py:953 ExportGenewebPlus.py:971
-#: ExportGenewebPlus.py:988
+#: ExportGenewebPlus.py:1035 ExportGenewebPlus.py:1057
+#: ExportGenewebPlus.py:1075 ExportGenewebPlus.py:1092
 msgid "Note"
 msgstr ""
 
-#: ExportGenewebPlus.py:943
+#: ExportGenewebPlus.py:1047
 msgid "Author"
 msgstr ""
 
-#: ExportGenewebPlus.py:944
+#: ExportGenewebPlus.py:1048
 msgid "Publication"
 msgstr ""
 
-#: ExportGenewebPlus.py:946
+#: ExportGenewebPlus.py:1050
 msgid "Abbreviation"
 msgstr ""
 
-#: ExportGenewebPlus.py:965
+#: ExportGenewebPlus.py:1069
 msgid "Repository"
 msgstr ""
 
-#: ExportGenewebPlus.py:967
+#: ExportGenewebPlus.py:1071
 msgid "Call Number"
 msgstr ""
 
-#: ExportGenewebPlus.py:979
+#: ExportGenewebPlus.py:1083
 msgid "Address"
 msgstr ""
 
-#: GenewebPlusPrefs.py:74
+#: GenewebPlusPrefs.py:76
 msgid "General"
 msgstr ""
 
-#: GenewebPlusPrefs.py:75
+#: GenewebPlusPrefs.py:77
 msgid "Compress the exported file (zip)"
 msgstr ""
 
-#: GenewebPlusPrefs.py:78
+#: GenewebPlusPrefs.py:80
 msgid "Sources"
 msgstr ""
 
-#: GenewebPlusPrefs.py:79
+#: GenewebPlusPrefs.py:81
 msgid "Include URLs in sources"
 msgstr ""
 
-#: GenewebPlusPrefs.py:83
+#: GenewebPlusPrefs.py:85
 msgid "Include repository information in sources"
 msgstr ""
 
-#: GenewebPlusPrefs.py:87
+#: GenewebPlusPrefs.py:89
 msgid "Beautify sources (one line per item, values in bold)"
 msgstr ""
 
-#: GenewebPlusPrefs.py:90
+#: GenewebPlusPrefs.py:92
 msgid "Events"
 msgstr ""
 
-#: GenewebPlusPrefs.py:91
+#: GenewebPlusPrefs.py:93
 msgid "Include witnesses"
 msgstr ""
 
-#: GenewebPlusPrefs.py:94
+#: GenewebPlusPrefs.py:97
+msgid "Places"
+msgstr ""
+
+#: GenewebPlusPrefs.py:99
+msgid ""
+"Geneanet place format ([ hamlet ] - Town, postal code, County, State, "
+"Country)"
+msgstr ""
+
+#: GenewebPlusPrefs.py:102
 msgid "GeneWeb plus"
 msgstr ""

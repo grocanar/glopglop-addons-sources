@@ -38,6 +38,7 @@ INCLUDE_REPOSITORIES = "options.include_repositories"
 BEAUTIFY = "options.beautify"
 COMPRESS = "options.compress"
 INCLUDE_WITNESSES = "options.include_witnesses"
+GENEANET_PLACES = "options.geneanet_places"
 
 
 def get_config():
@@ -53,6 +54,7 @@ def get_config():
     config.register(BEAUTIFY, True)
     config.register(COMPRESS, False)
     config.register(INCLUDE_WITNESSES, True)
+    config.register(GENEANET_PLACES, False)
     config.load()
     return config
 
@@ -91,6 +93,12 @@ def add_genewebplus_panel(configdialog):
     configdialog.add_checkbox(grid, _("Include witnesses"), 7,
                               INCLUDE_WITNESSES, config=config,
                               extra_callback=save)
+
+    section(_("Places"), 8)
+    configdialog.add_checkbox(
+        grid, _("Geneanet place format ([ hamlet ] - Town, postal code, "
+                "County, State, Country)"), 9,
+        GENEANET_PLACES, config=config, extra_callback=save)
     return _("GeneWeb plus"), grid
 
 

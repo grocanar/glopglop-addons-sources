@@ -57,10 +57,14 @@ from gramps.gen.utils.alive import probably_alive
 from gramps.gen.utils.string import conf_strings
 from gramps.gen.datehandler import displayer as _dd
 from gramps.gen.display.place import displayer as _pd
+from gramps.gen.config import config as grampsconfig
+from gramps.gen.lib.date import Today
+from gramps.gen.lib import PlaceType
+from gramps.gen.utils.location import get_location_list
 
 from GenewebPlusPrefs import (BEAUTIFY, COMPRESS, INCLUDE_REPOSITORIES,
-                              INCLUDE_URLS, INCLUDE_WITNESSES,
-                              get_config)
+                              GENEANET_PLACES, INCLUDE_URLS,
+                              INCLUDE_WITNESSES, get_config)
 
 # -------------------------------------------------------------------------
 #
@@ -245,6 +249,98 @@ def name_key(s):
     return "".join(c for c in s if c.isalnum())
 
 
+# ---------------------------------------------------------------------
+# Places in the Geneanet format:
+#   [ hamlet - street ] - Town, postal code, County, State, Country
+# The levels below the town go in brackets; missing levels keep their
+# place with empty commas.
+# ---------------------------------------------------------------------
+SUBTOWN_TYPES = (PlaceType.NUMBER, PlaceType.BUILDING, PlaceType.FARM,
+                 PlaceType.HAMLET, PlaceType.NEIGHBORHOOD, PlaceType.STREET,
+                 PlaceType.PARISH, PlaceType.LOCALITY, PlaceType.BOROUGH,
+                 PlaceType.UNKNOWN, PlaceType.CUSTOM)
+TOWN_TYPES = (PlaceType.CITY, PlaceType.VILLAGE, PlaceType.TOWN,
+              PlaceType.MUNICIPALITY)
+COUNTY_TYPES = (PlaceType.COUNTY, PlaceType.DEPARTMENT)
+STATE_TYPES = (PlaceType.STATE, PlaceType.REGION, PlaceType.PROVINCE)
+COUNTRY_TYPES = (PlaceType.COUNTRY,)
+# levels: 1 below the town, 2 town, 3 county, 4 state, 5 country
+LEVELS = ((SUBTOWN_TYPES, 1), (TOWN_TYPES, 2), (COUNTY_TYPES, 3),
+          (STATE_TYPES, 4), (COUNTRY_TYPES, 5))
+# types whose code is a postal code (not a country or region code)
+POSTAL_CODE_TYPES = TOWN_TYPES + (PlaceType.BOROUGH, PlaceType.NEIGHBORHOOD,
+                                  PlaceType.LOCALITY, PlaceType.PARISH)
+
+
+def postal_code(db, place):
+    """The code of the place, or else the first postal code found going
+    up the enclosing places."""
+    if place.get_code():
+        return place.get_code()
+    visited = {place.handle}
+    todo = [ref.ref for ref in place.get_placeref_list()]
+    while todo:
+        handle = todo.pop(0)
+        if handle in visited:
+            continue
+        visited.add(handle)
+        upper = db.get_place_from_handle(handle)
+        if not upper:
+            continue
+        if upper.get_code() and int(upper.get_type()) in POSTAL_CODE_TYPES:
+            return upper.get_code()
+        todo[0:0] = [ref.ref for ref in upper.get_placeref_list()]
+    return ""
+
+
+def place_level(place_type):
+    for types, level in LEVELS:
+        if int(place_type) in types:
+            return level
+    return 0
+
+
+def geneanet_place(db, place):
+    """The current name of a place, in the Geneanet format."""
+    if not place:
+        return ""
+    if not grampsconfig.get("preferences.place-auto"):
+        return place.get_title()
+    fmt = _pd.place_formats[grampsconfig.get("preferences.place-format")]
+    names = get_location_list(db, place, Today(), fmt.language)
+    code = postal_code(db, place)
+    text = ""
+    level = 0      # level of the last place written below the country
+    for name, place_type in names:
+        new = place_level(place_type)
+        if new == 0:
+            continue
+        if new == 1:
+            text = text + " - " + name if text else "[ " + name
+        elif new == 2:
+            if not text:
+                text = name + ", " + code
+            elif level == 1:
+                text += " ] - " + name + ", " + code
+            else:
+                text += ", " + name
+        elif not text:
+            # nothing below: the level is not counted
+            text = name
+            continue
+        elif level == 1:
+            # close the brackets, an empty comma for each missing level
+            text += " ] - " + "," * (new - 1) + " " + name
+        elif 2 <= level < new:
+            text += "," * (new - level) + " " + name
+        else:
+            text += ", " + name
+        level = new
+    if level == 1:
+        text += " ]"
+    return text
+
+
 # The options of the export are set in the "GeneWeb plus" page of the
 # Gramps preferences (see GenewebPlusPrefs.py).
 CONFIG = get_config()
@@ -269,6 +365,8 @@ class GeneWebPlusWriter:
         # beautified sources: one line per item, values in bold
         self.beautify = CONFIG.get(BEAUTIFY)
         self.include_witnesses = CONFIG.get(INCLUDE_WITNESSES)
+        self.geneanet_places = CONFIG.get(GENEANET_PLACES)
+        self.place_texts = {}    # place handle -> Geneanet place text
         self.part_separator = "<br>" if self.beautify else " - "
         self.source_separator = "<br><br>" if self.beautify else " ; "
 
@@ -869,9 +967,15 @@ class GeneWebPlusWriter:
         return notes
 
     def place(self, event):
-        if not event.get_place_handle():
+        handle = event.get_place_handle()
+        if not handle:
             return ""
-        return _pd.display_event(self.db, event)
+        if not self.geneanet_places:
+            return _pd.display_event(self.db, event)
+        if handle not in self.place_texts:
+            place = self.db.get_place_from_handle(handle)
+            self.place_texts[handle] = geneanet_place(self.db, place)
+        return self.place_texts[handle]
 
     def add_place(self, line, label, event):
         place = self.place(event)
