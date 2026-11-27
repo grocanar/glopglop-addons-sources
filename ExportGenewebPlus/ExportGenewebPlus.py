@@ -54,6 +54,7 @@ from gramps.gen.lib import (AttributeType, ChildRefType, Date, EventRoleType,
                             EventType, FamilyRelType, Person)
 from gramps.gui.plug.export import WriterOptionBox
 from gramps.gen.utils.alive import probably_alive
+from gramps.gen.proxy import PrivateProxyDb
 from gramps.gen.utils.string import conf_strings
 from gramps.gen.datehandler import displayer as _dd
 from gramps.gen.display.place import displayer as _pd
@@ -62,7 +63,8 @@ from gramps.gen.lib.date import Today
 from gramps.gen.lib import PlaceType
 from gramps.gen.utils.location import get_location_list
 
-from GenewebPlusPrefs import (BEAUTIFY, COMPRESS, INCLUDE_REPOSITORIES,
+from GenewebPlusPrefs import (BEAUTIFY, COMPRESS, EXCLUDE_PRIVATE,
+                              INCLUDE_REPOSITORIES,
                               GENEANET_PLACES, INCLUDE_URLS,
                               INCLUDE_WITNESSES, get_config)
 
@@ -360,6 +362,8 @@ class GeneWebPlusWriter:
         if option_box:
             self.option_box.parse_options()
             self.db = option_box.get_filtered_database(self.db)
+        if CONFIG.get(EXCLUDE_PRIVATE):
+            self.db = PrivateProxyDb(self.db)
         self.include_urls = CONFIG.get(INCLUDE_URLS)
         self.include_repositories = CONFIG.get(INCLUDE_REPOSITORIES)
         # beautified sources: one line per item, values in bold

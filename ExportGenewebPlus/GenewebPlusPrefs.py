@@ -39,6 +39,7 @@ BEAUTIFY = "options.beautify"
 COMPRESS = "options.compress"
 INCLUDE_WITNESSES = "options.include_witnesses"
 GENEANET_PLACES = "options.geneanet_places"
+EXCLUDE_PRIVATE = "options.exclude_private"
 
 
 def get_config():
@@ -55,6 +56,7 @@ def get_config():
     config.register(COMPRESS, False)
     config.register(INCLUDE_WITNESSES, True)
     config.register(GENEANET_PLACES, False)
+    config.register(EXCLUDE_PRIVATE, True)
     config.load()
     return config
 
@@ -64,41 +66,42 @@ def add_genewebplus_panel(configdialog):
     config = get_config()
     grid = configdialog.create_grid()
 
+    grid.set_column_spacing(24)
+
     def save(_obj):
         config.save()
 
-    def section(title, row):
+    def section(title, row, col):
         label = configdialog.add_text(grid, title, row, line_wrap=True,
-                                      bold=True, start=0, stop=7)
+                                      bold=True, start=col, stop=col + 1)
         if row:
             label.set_margin_top(10)
 
-    section(_("General"), 0)
-    configdialog.add_checkbox(grid, _("Compress the exported file (zip)"), 1,
-                              COMPRESS, config=config, extra_callback=save)
+    def option(label, row, col, key):
+        check = configdialog.add_checkbox(grid, label, row, key, start=col,
+                                          stop=col + 1, config=config,
+                                          extra_callback=save)
+        check.get_child().set_line_wrap(True)
+        check.get_child().set_max_width_chars(40)
+        check.set_hexpand(True)
 
-    section(_("Sources"), 2)
-    configdialog.add_checkbox(grid, _("Include URLs in sources"), 3,
-                              INCLUDE_URLS, config=config,
-                              extra_callback=save)
-    configdialog.add_checkbox(grid,
-                              _("Include repository information in sources"),
-                              4, INCLUDE_REPOSITORIES, config=config,
-                              extra_callback=save)
-    configdialog.add_checkbox(
-        grid, _("Beautify sources (one line per item, values in bold)"), 5,
-        BEAUTIFY, config=config, extra_callback=save)
+    # left column
+    section(_("General"), 0, 0)
+    option(_("Compress the exported file (zip)"), 1, 0, COMPRESS)
+    option(_("Exclude private data"), 2, 0, EXCLUDE_PRIVATE)
+    section(_("Sources"), 3, 0)
+    option(_("Include URLs in sources"), 4, 0, INCLUDE_URLS)
+    option(_("Include repository information in sources"), 5, 0,
+           INCLUDE_REPOSITORIES)
+    option(_("Beautify sources (one line per item, values in bold)"), 6, 0,
+           BEAUTIFY)
 
-    section(_("Events"), 6)
-    configdialog.add_checkbox(grid, _("Include witnesses"), 7,
-                              INCLUDE_WITNESSES, config=config,
-                              extra_callback=save)
-
-    section(_("Places"), 8)
-    configdialog.add_checkbox(
-        grid, _("Geneanet place format ([ hamlet ] - Town, postal code, "
-                "County, State, Country)"), 9,
-        GENEANET_PLACES, config=config, extra_callback=save)
+    # right column
+    section(_("Events"), 0, 1)
+    option(_("Include witnesses"), 1, 1, INCLUDE_WITNESSES)
+    section(_("Places"), 3, 1)
+    option(_("Geneanet place format ([ hamlet ] - Town, postal code, "
+             "County, State, Country)"), 4, 1, GENEANET_PLACES)
     return _("GeneWeb plus"), grid
 
 
